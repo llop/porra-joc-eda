@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+	<head th:substituteby="home::head"></head>
+    <body>
+	<header th:substituteby="home::mainHeader"></header>
+	<script th:inline="javascript">
+   	/*<![CDATA[*/
+   	function inspectObject(obj) {
+   		var s = "";
+   		for (x in obj) s += x + ": " + obj[x] + "\n";
+   		alert(s);
+   	}
+   	var betUrl, enduranceBetRateUrl, jqXHR, betsData = [];
+   	var playerSelect, playerSelectOptions, rondasInput, kudosInput, betRate, betsMade, playersData = [];
+   	function initVars() {
+   		betUrl = /*[[${#r.r('user', 'makeABet')}]]*/;
+   		enduranceBetRateUrl = /*[[${#r.r('bet', 'getEnduranceBetRate')}]]*/;
+   		playerSelect = $("#player-select");
+   		rondasInput = $("#rondas");
+   		kudosInput = $("#kudos");
+   		betRate = $("#current-bet-rate");
+   		betsMade = $("#bets-made");
+   		playerSelectOptions = playerSelect.prop ? playerSelect.prop('options') : playerSelect.attr('options');
+   	}
+   	function disableInputs() {
+   		playerSelect.attr('disabled', 'disabled');
+   		rondasInput.attr('disabled', 'disabled');
+   		kudosInput.attr('disabled', 'disabled');
+   	}
+   	function enableInputs() {
+   		playerSelect.removeAttr('disabled');
+   		rondasInput.removeAttr('disabled');
+   		kudosInput.removeAttr('disabled');
+   	}
+	function prepareAjax() {
+		$.ajaxPrefilter("json", function(options, originalOptions, jqXHR) { if (options.type == 'POST' || options.type == 'PUT') options.data = window.JSON.stringify(originalOptions.data); });
+		$(document).ajaxSend(function(event, jqxhr, settings) { disableInputs(); });
+		$(document).ajaxComplete(function(event, jqxhr, settings) { enableInputs(); });
+	}
+	function produceEnduranceBetRateUrl() {
+		var i = 0, pathVars = [ kudosInput.val(), playerSelect.val(), rondasInput.val() ];
+		return enduranceBetRateUrl.replace(/{.+?}/g, function() { return pathVars[i++]; });
+	}
+	function getBetRateDone(data, textStatus, jqxhr) { betRate.text(data.rate); }
+   	function getBetRateFail(jqxhr, textStatus, errorThrown) { alert("Error consultant la tassa!"); }
+   	function getBetRate() {
+   		jqXHR = $.ajax({ url: produceEnduranceBetRateUrl(), dataType: 'json', type: 'GET', contentType: "application/json;charset=UTF-8" })
+           	.done(getBetRateDone).fail(getBetRateFail);
+   	}
+   	function alertErrors(errors) {
+   		var errorText = "";
+		for (i in errors) errorText += errors[i] + "\n";
+		alert(errorText);
+   	}
+	function requestNewBetDone(data, textStatus, jqxhr) { 
+		if (data.errors) alertErrors(data.errors);
+		else { $('#b-m-tit').html('Apostes fetes'); updateData(data); getBetRate(); }
+	}
+   	function requestNewBetFail(jqxhr, textStatus, errorThrown) { alert("Error creant la nova aposta!"); }
+   	function makeABet() {
+   		var params = { jugador: playerSelect.val(), kudos: kudosInput.val(), tipus: 'AGUANTA', rondas: rondasInput.val() };
+   		jqXHR = $.ajax({ url: betUrl, data: params, dataType: 'json', type: 'POST', contentType: "application/json;charset=UTF-8" })
+           	.done(requestNewBetDone).fail(requestNewBetFail);
+   	}
+   	function digitsOnly(element) { element.val(element.val().replace(/[^0-9]/g, '')); }
+   	function updateDatas() {
+   		var newHtml = "";
+   		for (i in betsData) {
+   			var bet = betsData[i];
+   			newHtml += "<div class='bets-made-row'>";
+   			// Start bet info
+			newHtml += "<div>";
+			newHtml += "<span class='w-s'>" + bet.kudos + "</span><span> kudos a que </span><span class='w-s'>" + bet.player + "</span>";
+			if (bet.type == 'AGUANTA') newHtml += "<span> aguanta </span><span class='w-s'>" + bet.enduresRounds + "</span><span> rondes des de la </span><span class='w-s'>" + bet.betOnRound + "</span><span>.</span>";
+   			else if (bet.type == 'SEMIS') newHtml += "<span class='w-s'> arribarà a la taula final.</span>";
+   			else if (bet.type == 'FINAL') newHtml += "<span class='w-s'> guanyarà el joc.</span>";
+   			newHtml += "</div>";
+   			// End bet info
+   			// Start balance
+ 			newHtml += "<div class='p-t-10'>";
+ 			if (bet.active) newHtml += "<span>Pots guanyar </span>";
+ 			else if (bet.won) newHtml += "<span>Has guanyat </span>";
+ 			else newHtml += "<span>Has perdut </span>";
+ 			newHtml += "<strong><span class='o-s'>" + bet.balance + "</span></strong><span> kudos</span>";
+ 			newHtml += "</div>";
+ 			// End balance
+ 			newHtml += "</div>";
+   		}
+   		betsMade.html(newHtml);
+   		for (i in playersData) {
+			var playerData = playersData[i].split(","); 
+			var optionVal = playerData[0]; 
+  			var optionText = optionVal + ' (' + playerData[1] + ')';
+  			playerSelectOptions[playerSelectOptions.length] = new Option(optionText, optionVal);
+   		}
+   		playerSelect.trigger('change');
+   	}
+   	function updateData(data) {
+   		betsData = data.betsData;
+   		var generalData = data.generalData;
+   		playersData = generalData.alivePlayerNames;
+   		updateDatas();
+   		kudosInput.attr('max', generalData.kudosLeftInt);
+   		rondasInput.attr('max', generalData.maxEndureRounds);
+   		$("#active-bets").text(generalData.activeBets);
+   		$("#kudos-left").text(generalData.kudosLeft);
+   	}
+   	$(document).ready(function() { 
+   		initVars();
+   		prepareAjax();
+   		playerSelect.change(function(event) { getBetRate(); });
+   		rondasInput.keyup(function(event) { digitsOnly(rondasInput); });
+   		rondasInput.change(function(event) { getBetRate(); });
+   		kudosInput.keyup(function(event) { digitsOnly(kudosInput); });
+   		$("#new-bet").click(makeABet);
+   		getBetRate();
+   		updateDatas();
+   	});
+   	/*]]>*/
+   	</script>
+	<section id="main-section">
+	<div id="m-block">
+    <section th:substituteby="home::blockLeft"></section>
+   	<div id="m-block-top">
+    	<section th:substituteby="home::userSection"></section>
+    	<!-- playernames for drop down -->
+	   	<script th:inline="javascript" th:each="name,rowStat : ${alivePlayerNames}">
+	   	/*<![CDATA[*/ 
+        	playersData.push(/*[[${ name }]]*/ ""
+			);
+		/*]]>*/
+	   	</script>
+		<!-- Make a bet -->
+   		<section id="bet-form">
+   			<div class="p-1"><span class="t-r-t">Fer una aposta</span></div>
+			<div class="p-2">
+	            <div class="t-r-d-l"><label for="player-select">Jugador:</label></div>
+				<div class="t-r-d-r">
+				<select id="player-select" name="player-select"></select>
+				</div>
+	            <div class="t-r-d-l"><label for="rondas">Rondes que sobreviur&agrave;:</label></div>
+	            <div class="t-r-d-r"><input type="number" id="rondas" name="rondas" min="1" th:max="${maxEndureRounds}" step="1" th:value="${defaultEndureRounds}" /></div>
+	            <div class="t-r-d-l"><label for="kudos">Kudos:</label></div>
+	            <div class="t-r-d-r"><input type="number" id="kudos" name="kudos" min="1" th:max="${kudosLeftInt}" step="1" th:value="${defaultKudos}" /></div>
+				<div class="t-r-b-l"><span>Est&agrave; a </span><strong><span id="current-bet-rate" class="o-s"></span></strong><span> kudos</span></div>
+				<div class="t-r-b-r"><input id="new-bet" type="button" value="Me la jugo!" class="large-text"/></div>
+	        </div>
+		</section>
+   	</div>
+   	
+   	<!-- bets made -->
+   	<section id="bets-made-box">
+   	
+   		<div class="p-1">
+   			<span id="b-m-tit" class="large-text" th:if="${bets.empty}">Encara no has fet cap aposta</span>
+			<span id="b-m-tit" class="large-text" th:if="${!bets.empty}">Apostes fetes</span>
+		</div>
+		
+   		<div id="bets-made">
+ 		<div th:each="bet,rowStat : ${bets}" class="bets-made-row">
+ 		<script th:inline="javascript" th:if="${bet.type == 'AGUANTA'}">
+   		/*<![CDATA[*/ 
+           	betsData.push({ kudos: /*[[${ bet.kudos }]]*/, 
+							player: /*[[${ bet.player }]]*/, 
+							active: /*[[${ bet.active }]]*/, 
+							won: /*[[${ bet.won }]]*/, 
+							balance: /*[[${ bet.balance }]]*/, 
+							enduresRounds: /*[[${ bet.enduresRounds }]]*/, 
+							betOnRound: /*[[${ bet.betOnRound }]]*/, 
+							type: /*[[${ bet.type }]]*/ ""
+						});
+   		/*]]>*/
+	   	</script>
+	   	<script th:inline="javascript" th:if="${bet.type == 'SEMIS'} or ${bet.type == 'FINAL'}">
+	   	/*<![CDATA[*/ 
+        	betsData.push({ kudos: /*[[${ bet.kudos }]]*/, 
+							player: /*[[${ bet.player }]]*/, 
+							active: /*[[${ bet.active }]]*/, 
+							won: /*[[${ bet.won }]]*/, 
+							balance: /*[[${ bet.balance }]]*/, 
+							type: /*[[${ bet.type }]]*/ ""
+						});
+		/*]]>*/
+	   	</script>
+	   	
+   		</div>
+   		</div>
+   	</section>
+   	</div>
+   	</section>
+	<footer th:substituteby="home::mainFooter"></footer>
+	</body>
+</html>

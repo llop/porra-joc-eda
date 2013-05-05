@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+	<head th:substituteby="home::head"></head>
+    <body>
+    <header th:substituteby="home::mainHeader"></header>
+    <section id="main-section">
+   	<div id="m-block">
+    <section th:substituteby="home::blockLeft"></section>
+   	<div id="m-block-top">
+    	<section th:substituteby="home::userSection"></section>
+   		
+   		<!-- login error box -->
+   		<section th:if="${loginError}" class="right-box">
+   			<div class="f-l"><img th:src="${#r.s('warning.gif', 'img')}" alt="Warning" /></div>
+   			<div id="login-err"><ul><li><span>Combinaci&oacute; de nom i clau incorrecta</span></li></ul></div>
+		</section>
+		
+		<!-- login form -->
+   		<section class="right-box">
+   			<div class="p-3"><span class="large-text">Accedeix al teu panell</span></div>
+			<form th:action="@{/j_spring_security_check}" method="post">
+			<div class="p-3">
+	            <div class="t-r-a-n-l"><label for="j_username">Nom d'usuari:</label></div>
+				<div class="t-r-a-n-r"><input type="text" id="j_username" name="j_username" autofocus="autofocus" /></div>
+	            <div class="t-r-a-n-l"><label for="j_password">Clau:</label></div>
+	            <div class="t-r-a-n-r"><input type="password" id="j_password" name="j_password" /></div>
+				<div class="t-r-a-b"><input id="login-button" type="submit" value="Entrar!" class="large-text"/></div>
+	        </div>
+	        </form>
+		</section>
+		
+	</div>
+	</div>
+	</section>
+	<footer th:substituteby="home::mainFooter"></footer>
+	</body>
+</html>

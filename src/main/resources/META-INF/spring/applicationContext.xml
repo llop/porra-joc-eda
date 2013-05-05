@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<context:component-scan base-package="net.llop.porraeda" />
+	<mvc:annotation-driven />
+	<mvc:interceptors>
+		<bean class="net.llop.porraeda.security.LoggedUserInterceptor" />
+		<bean class="net.llop.porraeda.interceptor.DaHouseInterceptor" />
+		<mvc:interceptor>
+			<mvc:mapping path="/nova-clau" />
+			<mvc:mapping path="/apuntar-se" />
+			<bean class="net.llop.recaptcha.spring.interceptor.ReCaptchaInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- Configure Authentication mechanism -->
+	<security:authentication-manager alias="authenticationManager">
+		<security:authentication-provider ref="mongoDBAuthenticationProvider" />
+	</security:authentication-manager>
+
+	<security:http auto-config="true" use-expressions="true">
+		<!-- Login pages -->
+		<security:form-login login-page="/entrar/" authentication-failure-url="/entrar/error" />
+		<security:logout invalidate-session="true" />
+		<!-- Security zones -->
+		<security:intercept-url pattern="/usuari/**" access="hasRole('ROLE_USER')" />
+	</security:http>
+
+</beans>
