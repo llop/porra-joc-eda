@@ -29,7 +29,12 @@ import org.springframework.util.StringUtils;
 
 import com.mongodb.Mongo;
 
-@Configuration
+
+/**
+ * Mongo beans.
+ * @author Llop
+ */
+@Configuration 
 public class MongoDBConfig {
 	
 	private static final String ENV_MONGODB_HOST = "OPENSHIFT_MONGODB_DB_HOST";

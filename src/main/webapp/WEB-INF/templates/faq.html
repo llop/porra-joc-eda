@@ -12,7 +12,7 @@
   		<section id="q-a-section">
   		<div class="quest"><span>De què va aquesta web?</span></div>
   		<div class="ans">
-   		<p>Et permet apostar <strong>kudos</strong>, una moneda fictícia, pels teus jugadors favorits del <strong>Joc d'EDA</strong> -<strong>Battle Royale</strong>!!!</p>
+   		<p>Et permet apostar <strong>kudos</strong>, una moneda fictícia, pels teus jugadors favorits del <span class="w-s">Joc d'EDA - Battle Royale</span><strong>!!!</strong></p>
   		</div> 
   		</section>
   		
@@ -48,6 +48,10 @@
    		<p>El nombre de participants que creuen en un jugador també influeix:</p>
    		<code><strong>f</strong> = (participants que aposten pel jugador) / (total de participants que aposten)</code>
    		<p>Aquest factor multiplica la diferència entre 1 i <code>p</code>, i es suma a <code>p</code>. L'invers d'aquest número, multiplicat pels kudos apostats, dona el premi per encertar.</p>
+   		<p>Com que <strong>les apostes dels demés influeixen sobre les teves</strong>, és possible que la recompensa de les teves apostes:</p>
+   		<p class="p-l-20"><strong>+ Puji</strong> si els demés usuaris voten per altres jugadors, o bé<br />
+   		<strong> + Baixi</strong> si tothom vota pel mateix jugador que tú.</p>
+   		<p>Les primeres apostes que es facin no tindràn beneficis en el premi per aquesta raó, però això canviarà de seguida que tothom comenci a votar pel seu jugador i el dels amics! <span class="w-s">:D</span></p>
   		</div> 
   		</section>
   		
@@ -64,7 +68,7 @@
   		<div class="quest"><span>He perdut el meu password, què faig?</span></div>
   		<div class="ans">
    		<p>No el perdis! El sistema no pot recuperar passwords!!!</p>
-   		<p>...És broma! Fes click <a th:href="${#r.r('home', 'resetPassGet')}" target="_blank"><span class="w-s">aquí</span></a>. Hauràs de plenar un captcha i indicar el teu nom d'usuari. Se't tornarà a enviar un correu al mail del Racó, amb la URL per que tornis a activar el teu usuari introduïnt un nou password.</p>
+   		<p>...És broma! Fes click <a th:href="${#r.r('home', 'resetPassGet')}" target="_blank"><span class="w-s">aquí</span></a>. Hauràs de plenar un captcha i indicar el teu nom d'usuari. Se't tornarà a enviar un email, amb la URL per que tornis a activar el teu usuari introduïnt un nou password.</p>
   		</div> 
   		</section>
   		
@@ -81,6 +85,13 @@
    		<p>Assegura't de tenir el <strong>javascript activat</strong>, i de fer servir <a href="http://www.google.com/chrome" target="_blank"><span class="w-s">Chrome</span></a> (preferiblement) o <a href="http://www.mozilla.org" target="_blank"><span class="w-s">Firefox</span></a>!</p>
    		<p>Si ja tens això, potser és un error temporal. Espera una estona i torna a probar.</p>
    		<p>Si el problema persisteix, envia un mail a l'<code>albert.lobo&#64;est.fib.upc.edu</code>, amb subject <strong>Web Porra Joc EDA</strong></p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>He fet una aposta de la que me'n penedeixo! La puc cancel·lar?</span></div>
+  		<div class="ans">
+   		<p>Ens sap greu però les apostes fetes no es poden cancel·lar! Aixó és només per donar més emoció: T'ho hauràs de pensar bé abans de decidir-te per un jugador!</p>
   		</div> 
   		</section>
   		

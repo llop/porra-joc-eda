@@ -19,7 +19,6 @@
  */
 package net.llop.porraeda.security;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,7 +26,6 @@ import net.llop.porraeda.model.UserAccount;
 import net.llop.porraeda.model.bet.Bill;
 import net.llop.porraeda.service.UserService;
 import net.llop.porraeda.util.BetUtils;
-import net.llop.porraeda.util.RacoUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +36,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+/**
+ * If user is authenticated, their userAccount bean and other useful stuff will be stuffed in the request
+ * @author Llop
+ */
 public class LoggedUserInterceptor extends HandlerInterceptorAdapter  {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());

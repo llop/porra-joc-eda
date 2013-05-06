@@ -32,6 +32,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+/**
+ * Bolts daHouse in the request so it can be accessed everywhere without having to re-query DB
+ * @author Llop
+ */
 public class DaHouseInterceptor extends HandlerInterceptorAdapter  {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());

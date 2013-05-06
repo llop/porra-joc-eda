@@ -19,7 +19,6 @@
  */
 package net.llop.recaptcha.spring.interceptor;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,6 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+/**
+ * Validates the captcha before the controller method's called. 
+ * Will leave a boolean flag in the request with the validation's outcome
+ * @author Llop
+ */
 public class ReCaptchaInterceptor extends HandlerInterceptorAdapter  {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());

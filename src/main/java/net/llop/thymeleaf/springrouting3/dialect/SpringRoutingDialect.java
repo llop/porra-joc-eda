@@ -31,6 +31,10 @@ import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.dialect.IExpressionEnhancingDialect;
 import org.thymeleaf.spring3.dialect.SpringStandardDialect;
 
+/**
+ * The regular spring thymeleaf dialect, but with a springrouter instance available as utility object
+ * @author Llop
+ */
 public class SpringRoutingDialect extends SpringStandardDialect implements IExpressionEnhancingDialect  {
 	
 	@Autowired private SpringRouter springRouter;

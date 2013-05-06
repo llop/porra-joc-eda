@@ -19,7 +19,10 @@
  */
 package net.llop.recaptcha;
 
-
+/**
+ * ReCAPTCHA keys
+ * @author Llop
+ */
 public class ReCaptchaUtils {
 	
 	public final static String RECAPTCHA_PUBLIC_KEY = "RECAPTCHA_PUBLIC_KEY";

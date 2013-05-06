@@ -21,4 +21,8 @@ package net.llop.thymeleaf.springrouting3.dropbox;
 
 import net.llop.thymeleaf.springrouting3.BaseAssetsHost;
 
+/**
+ * Dropbox assets host. base class already has all needed functionality
+ * @author Llop
+ */
 public class DropboxAssetsHost extends BaseAssetsHost {}

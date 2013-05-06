@@ -23,9 +23,16 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+/**
+ * Utility stuff for bets
+ * @author Llop
+ */
 public class BetUtils {
 
+	public static final String MASTA_HOUSE = "MASTER";
 	public static final String DA_HOUSE = "daHouse";
+	
+	public static final String NO_PLAYER = "---";
 	
 	public static final Double INITIAL_CREDIT = 1000d;
 	public static final Integer SUGGESTED_MIN_BET = 100;

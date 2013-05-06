@@ -19,10 +19,12 @@
  */
 package net.llop.porraeda.repository;
 
-
 import net.llop.porraeda.model.Role;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface RoleRepository extends MongoRepository<Role, String> {
-}
+/**
+ * user role mongo repo. Used by springdata to create the proxy bean
+ * @author Llop
+ */
+public interface RoleRepository extends MongoRepository<Role, String> {}

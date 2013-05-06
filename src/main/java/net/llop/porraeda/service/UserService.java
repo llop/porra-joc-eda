@@ -40,6 +40,10 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+/**
+ * Does user account stuff like creating and updating -even deleting! 
+ * @author Llop
+ */
 @Service
 public class UserService {
 	

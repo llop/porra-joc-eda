@@ -19,7 +19,10 @@
  */
 package net.llop.porraeda.model.bet;
 
-
+/**
+ * The kind of bet that's initially available. User chooses how long a player's gonna survive.
+ * @author Llop
+ */
 public class EnduranceBet extends BaseBet {
 
 	

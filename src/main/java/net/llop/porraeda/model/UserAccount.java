@@ -35,6 +35,11 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Adapted from the springsecurity + MongoDB tutorial.
+ * The user account bean.
+ * @author Llop
+ */
 @Document
 public class UserAccount {
 

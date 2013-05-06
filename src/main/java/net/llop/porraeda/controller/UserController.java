@@ -52,7 +52,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-// First commit
+/**
+ * User requests controller
+ * @author Llop
+ */
 @Controller
 @RequestMapping(Routes.USER)
 public class UserController {

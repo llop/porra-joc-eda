@@ -35,7 +35,7 @@
 		<property name="additionalDialects">
 			<set>
 				<bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect" />
-				<bean class="net.llop.recaptcha.thymeleaf.dialect.ReCaptchaDialect" />
+				<bean class="net.llop.thymeleaf.recaptcha.dialect.ReCaptchaDialect" />
 			</set>
 		</property>
 	</bean>

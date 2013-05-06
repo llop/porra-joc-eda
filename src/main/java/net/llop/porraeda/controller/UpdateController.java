@@ -51,6 +51,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * Handles update requests -not available to users!!!
+ * They should be invoked by a daemon thread that runs every so often.
+ * @author Llop
+ */
 @Controller
 @RequestMapping(Routes.UPDATE)
 public class UpdateController {
@@ -62,7 +67,7 @@ public class UpdateController {
 	
 	@RequestMapping(value=Routes.BETS, method=RequestMethod.GET, produces=MediaType.TEXT_HTML_VALUE)
 	public String updateBets(final Model model, final HttpServletRequest request) {
-		this.logger.info("UpdateController.update");
+		this.logger.info("UpdateController.updateBets");
 		try {
 			// battle-royale.jutge.org has an untrusted cert
 			final TrustStrategy easyStrategy = new TrustStrategy() { @Override public boolean isTrusted(final X509Certificate[] certificate, final String authType) throws CertificateException { return true; } };
@@ -87,8 +92,8 @@ public class UpdateController {
 	}
 	
 	@RequestMapping(value=Routes.USER, method=RequestMethod.GET, produces=MediaType.TEXT_HTML_VALUE)
-	public String updateusers(final Model model, final HttpServletRequest request) {
-		this.logger.info("UpdateController.update");
+	public String updateUsers(final Model model, final HttpServletRequest request) {
+		this.logger.info("UpdateController.updateUsers");
 		this.userService.expireUsers();
 		return "updated";
 	}

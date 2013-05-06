@@ -48,7 +48,16 @@ import org.springframework.web.servlet.mvc.condition.NameValueExpression;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-
+/**
+ * Produces the appropriate URLs, given the controller name and method that's supposed to handle the requests, or alternatively it can provide URLs for static assets.
+ * For appllication routes: string r(...)
+ * 		- This is possible for all RequestMapping annotated methods. Examples
+ * 		springRouterInstance.r("home", "welcome"); 								// Produces the root URL '/'
+ * 		springRouterInstance.r("signup", "activateGet", "this-is-my-token");  	// Produces '/apuntar-se/activar/this-is-my-token'
+ * For static asset URLs: string s(...)
+ * 		springRouterInstance.s("my-image.gif", "img");							// Could produce 'http://static-asset-server/img/my-image.gif'
+ * @author Llop
+ */
 public class SpringRouter implements ApplicationContextAware, ServletContextAware {
 
 	private final static String CONTROLLER_SUFFIX = "Controller";

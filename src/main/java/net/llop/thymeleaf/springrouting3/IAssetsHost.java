@@ -19,7 +19,11 @@
  */
 package net.llop.thymeleaf.springrouting3;
 
-
+/**
+ * Implement this interface to have a custom assets host
+ * Look into BaseAssetsHost for a simple implementation
+ * @author Llop
+ */
 public interface IAssetsHost {
 	
 	// Implementations should return the url for a resource:

@@ -24,6 +24,10 @@ import net.llop.porraeda.model.UserAccount;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+/**
+ * user account mongo repo. Used by springdata to create the proxy bean
+ * @author Llop
+ */
 public interface UserAccountRepository extends MongoRepository<UserAccount, ObjectId> {
 	
 	UserAccount findByUsername(final String username);

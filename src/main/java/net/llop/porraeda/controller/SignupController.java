@@ -38,6 +38,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * Handles the signup requests
+ * @author Llop
+ */
 @Controller
 @RequestMapping(Routes.SIGNUP)
 public class SignupController {

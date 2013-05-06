@@ -25,6 +25,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.llop.thymeleaf.springrouting3.IAssetsHost;
 
+/**
+ * Simple, base implementation of an assets host
+ * @author Llop
+ */
 public class BaseAssetsHost implements IAssetsHost {
 	
 	private final static String URL_SEPARATOR = "/";

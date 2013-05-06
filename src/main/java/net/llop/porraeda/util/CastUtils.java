@@ -19,6 +19,10 @@
  */
 package net.llop.porraeda.util;
 
+/**
+ * Springdata MongoDB to Java sometimes screws up object type since DB definition is "unusual"
+ * @author Llop
+ */
 public class CastUtils {
 	
 	public final static Integer toInteger(Object obj) {

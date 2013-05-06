@@ -20,6 +20,10 @@
 package net.llop.porraeda.util;
 
 
+/**
+ * Does format validation
+ * @author Llop
+ */
 public class ValidationUtils {
 	
 	private final static String PASSWORD_PATTERN = "[a-zA-Z0-9]{4,16}";

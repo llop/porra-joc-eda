@@ -24,6 +24,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Copied from the springsecurity + MongoDB tutorial.
+ * The user role bean.
+ * @author Llop
+ */
 @Document
 public class Role {
 

@@ -22,7 +22,10 @@ package net.llop.porraeda.model.bet;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Every user has one of these. It's how many kudos they've got, a list of their bets and a calculated field. 
+ * @author Llop
+ */
 public class Bill {
 
 	

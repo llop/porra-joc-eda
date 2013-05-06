@@ -49,7 +49,7 @@
 				<div id="fib-logo"><a href="http://www.fib.upc.edu" target="_blank"><img th:src="${#r.s('Logo_FIB.gif', 'img')}" alt="Logo FIB" /></a></div>
 			</div>
 			<div id="fb-root"></div>
-			<div id="head-links"><div><a href="https://battle-royale.jutge.org/" target="_blank"><img th:src="${#r.s('rjutge.jpg', 'img')}" alt="Battle Royale Jutge" /></a></div></div>
+			<div id="head-links"><div><a href="https://battle-royale.jutge.org/" target="_blank"><img th:src="${#r.s('rjutge.png', 'img')}" alt="Battle Royale Jutge" /></a></div></div>
 			<div id="head-links">
 				<script>(function(d, s, id) {
 				  var js, fjs = d.getElementsByTagName(s)[0];
@@ -81,6 +81,7 @@
     		<div class="p-5">
     			<div><span class="large-text">Última ronda: <span class="o-s" th:text="${daHouse.currentRound}"></span></span></div>
     			<div class="p-t-20"><div><span class="large-text"><span class="o-s" th:text="${daHouse.playersLeft}"></span> supervivents</span></div></div>
+    			<div id="plf-00" class="prl"></div><div id="plf-01" class="prl"></div><div id="plf-02" class="prl"></div><div id="plf-10" class="prl"></div><div id="plf-11" class="prl"></div><div id="plf-12" class="prl"></div><div id="plf-20" class="prl"></div><div id="plf-21" class="prl"></div><div id="plf-22" class="prl"></div><div id="plf-30" class="prl"></div><div id="plf-31" class="prl"></div><div id="plf-32" class="prl"></div><div id="plf-40" class="prl"></div><div id="plf-41" class="prl"></div><div id="plf-42" class="prl"></div><div id="plf-50" class="prl"></div><div id="plf-51" class="prl"></div><div id="plf-52" class="prl"></div><div id="plf-60" class="prl"></div><div id="plf-61" class="prl"></div><div id="plf-62" class="prl"></div><div id="plf-70" class="prl"></div><div id="plf-71" class="prl"></div><div id="plf-72" class="prl"></div><div id="plf-80" class="prl"></div><div id="plf-81" class="prl"></div><div id="plf-82" class="prl"></div><div id="plf-90" class="prl"></div><div id="plf-91" class="prl"></div><div id="plf-92" class="prl"></div>
     			<div class="p-t-40">
     				<div><span class="large-text">Batalla final en:</span></div>
     				<script>var myCountdown1 = new Countdown({ year:2013, month:5, day:30, hour:3, ampm:"pm", minute:0, second:0, rangeHi:"day", width:260, height:50, style:"flip" });</script>
@@ -99,15 +100,21 @@
 				<div class="p-t-10"><a th:href="${#r.r('home', 'userDashboard')}"><span class="w-s">Fer una aposta</span></a></div>
 			</nav>
 			</section>
-    		<div class="a-bg">
+    		<section class="a-bg">
 			<div id="takeshi-says"><img th:src="${#r.s('takesi.jpg', 'img')}" alt="Takeshi says" /></div>
 			<div id="bet-now">
 			<p><span class="f-s-16"><strong>Ja pots apostar pel teu jugador favorit del joc d'EDA!</strong></span></p>
 			<p class="p-t-20"><a th:href="${#r.r('home', 'faq')}"><span class="w-s-big">Descobreix com jugar</span></a></p>
 			<p class="p-t-20"><a th:href="${#r.r('home', 'signupGet')}"><span class="w-s-big">Apunta't!</span></a></p>
 			<p class="p-t-20"><a th:href="${#r.r('home', 'userDashboard')}"><span class="w-s">Si ja tens un usuari, entra aquí</span></a></p>
-			<p class="p-t-40"><a th:href="${#r.r('home', 'contribute')}"><span class="w-s">Aquesta web podria servir per futures edicions del Joc!<br /><strong>Ajuda a fer-la gran!</strong></span></a></p>
 			</div>
+			</section>
+			<div class="p-t-20">
+			<section class="a-bg">
+			<div id="bet-now">
+			<p class="p-t-20"><a th:href="${#r.r('home', 'contribute')}"><span class="w-s">Aquesta web podria servir per futures edicions del Joc!<br /><strong>Ajuda a fer-la gran!</strong></span></a></p>
+			</div>
+			</section>
 			</div>
     	</div>
     	</div>

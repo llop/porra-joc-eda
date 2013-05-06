@@ -19,7 +19,10 @@
  */
 package net.llop.porraeda.security;
 
-
+/**
+ * Constants used by logged user interceptor, theuy are ids for the injected request attributes
+ * @author Llop
+ */
 public class LoggedUserUtils {
 	
 	public static final String LOGGED_USER = "loggedUser";

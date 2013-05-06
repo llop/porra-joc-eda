@@ -19,8 +19,10 @@
  */
 package net.llop.porraeda.util;
 
-
-
+/**
+ * Constants to build routes
+ * @author Llop
+ */
 public class Routes {
 	
 	public static final String ROOT = "/";

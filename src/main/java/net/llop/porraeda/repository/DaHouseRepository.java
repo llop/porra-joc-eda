@@ -23,7 +23,8 @@ import net.llop.porraeda.model.DaHouse;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface DaHouseRepository extends MongoRepository<DaHouse, String> {
-	
-	
-}
+/**
+ * daHouse mongo repo. Used by springdata to create the proxy bean
+ * @author Llop
+ */
+public interface DaHouseRepository extends MongoRepository<DaHouse, String> {}

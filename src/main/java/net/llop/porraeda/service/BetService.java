@@ -21,6 +21,7 @@ package net.llop.porraeda.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -45,25 +46,41 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class BetService {
-
+/**
+ * Handles bet related functionality.
+ * @author Llop
+ */
+@Service public class BetService {
+	
+	
+	// Thanks a ton to Jordi Petit! He whipped up the update data service backend for battle-royale.jutge.org in no time!
+	private final static String JUTGE_NO_HANDLE = "null";
+	private final static String JUTGE_CURRENT_ROUND = "ronda_actual";
+	private final static String JUTGE_CONTESTANT = "representant";
+	private final static String JUTGE_DEAD = "mort";
+	private final static String JUTGE_PLAYS = "juga";
+	private final static String JUTGE_NAME = "nom";
+	private final static String JUTGE_USERS = "usuaris";
+	
+	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired private DaHouseRepository daHouseRepository;
 	@Autowired private UserAccountRepository userRepository;
 	
+	
 	public DaHouse getDaMastaHouse() {
-		return this.daHouseRepository.findOne("MASTER");
+		this.logger.info("BetService.getDaMastaHouse");
+		return this.daHouseRepository.findOne(BetUtils.MASTA_HOUSE);
 	}
 	
 	public void makeABet(final UserAccount userAccount, final BaseBet bet, final DaHouse daHouse) {
-		logger.info("BetService.makeABet");
+		this.logger.info("BetService.makeABet");
 		final Bill bill = userAccount.getBill();
 		bill.setKudos(bill.getKudos() - bet.getKudos());
 		bill.setActiveBets(bill.getActiveBets() + 1);
 		final List<BaseBet> bets = bill.getBets();
-		bets.add(bet);
+		bets.add(0, bet);
 		this.incrementIfPlayerFirst(bets, bet, daHouse);
 		this.userRepository.save(userAccount);
 	}
@@ -82,6 +99,7 @@ public class BetService {
 	}
 	
 	public Double getCurrentBalance(final BaseBet bet, final DaHouse daHouse) {
+		this.logger.info("BetService.getCurrentBalance");
 		return this.getRate(bet, daHouse) * bet.getKudos();
 	}
 	
@@ -117,7 +135,7 @@ public class BetService {
 		//if (!RacoUtils.validaNom(name)) return false;
 		// boolean isValid = true;
 		// Validar contr Datatable
-		return this.isPlayerAlive(name, daHouse);
+		return this.isPlayerAliveAndHasHandle(name, daHouse);
 		// Validar contra el Raco
 //		try {
 //			List<NameValuePair> params = new ArrayList<>();
@@ -154,12 +172,17 @@ public class BetService {
 	@SuppressWarnings("rawtypes")
 	public List<String> getAlivePlayerNames(final DaHouse daHouse) {
 		this.logger.info("BetService.getAlivePlayerNames");
-		List<String> alivePlayerNames = new ArrayList<String>();
-		for (Entry<String, Map> entry : daHouse.getPlayers().entrySet()) 
-			if ((Boolean)entry.getValue().get(DaHouse.PLAYER_ALIVE)) {
-				String alivePlayerName = entry.getKey() + "," + entry.getValue().get(DaHouse.HANDLE);
+		final List<String> alivePlayerNames = new ArrayList<String>();
+		for (Entry<String, Map> entry : daHouse.getPlayers().entrySet()) {
+			final Map value = entry.getValue();
+			final Boolean isAlive = (Boolean)value.get(DaHouse.PLAYER_ALIVE);
+			final String handle = (String)value.get(DaHouse.HANDLE);
+			final Boolean hasHandle = !BetUtils.NO_PLAYER.equals(handle);
+			if (isAlive && hasHandle) {
+				final String alivePlayerName = entry.getKey() + "," + entry.getValue().get(DaHouse.HANDLE);
 				alivePlayerNames.add(alivePlayerName);
 			}
+		}
 		Collections.sort(alivePlayerNames);
 		return alivePlayerNames;
 	}
@@ -169,46 +192,45 @@ public class BetService {
 		return daHouse.getPlayers().containsKey(sanitizedPlayerName);
 	}
 	
-	private boolean isPlayerAlive(final String player, final DaHouse daHouse) {
+	@SuppressWarnings("rawtypes")
+	private boolean isPlayerAliveAndHasHandle(final String player, final DaHouse daHouse) {
 		if (!this.playerExists(player, daHouse)) return false;
 		final String sanitizedPlayerName = BetUtils.sanitizePlayerName(player);
-		return (boolean)daHouse.getPlayers().get(sanitizedPlayerName).get(DaHouse.PLAYER_ALIVE);
+		final Map<String, Map> players = daHouse.getPlayers();
+		final Map playerData = players.get(sanitizedPlayerName);
+		final Boolean isAlive = (Boolean)playerData.get(DaHouse.PLAYER_ALIVE);
+		final String handle = (String)playerData.get(DaHouse.HANDLE);
+		return isAlive && !BetUtils.NO_PLAYER.equals(handle);
 	}
 	
-
+	/**
+	 * Crazy method to update the database with new data from battle-royale.jutge.org
+	 * It's gonna get invoked on a minutely basis by a scheduled cron job (a daemon thread)
+	 * @param jsonData
+	 * @param daHouse
+	 * @return
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean updateDaHouse(final String jsonData, final DaHouse daHouse) {
-		/** final Map<String, Map> newPlayers = new HashMap<String, Map>(); */
+		this.logger.info("BetService.updateDaHouse");
 		try {
 			// Parse JSON
 			final ObjectMapper mapper = new ObjectMapper();
 			final JsonNode actualObj = mapper.readTree(jsonData);
-			final Integer rondaActual = actualObj.get("ronda_actual").asInt();
+			final Integer rondaActual = actualObj.get(JUTGE_CURRENT_ROUND).asInt();
 			final Map<String, Map> players = daHouse.getPlayers();
 			// maybe no need to update
 			final boolean roundAdvanced = rondaActual > daHouse.getCurrentRound();
 			boolean update = roundAdvanced;
 			// Iterate users
-			final JsonNode usuaris = actualObj.get("usuaris");
+			final JsonNode usuaris = actualObj.get(JUTGE_USERS);
 			for (int i = 0; i < usuaris.size(); i++) {
 				final JsonNode usuari = usuaris.get(i);
-				final String nom = usuari.get("nom").asText();
+				final String nom = usuari.get(JUTGE_NAME).asText();
 				final String nomNormal = RacoUtils.normalitzaNom(nom);
-				final Integer juga = usuari.get("juga").asInt();
-				final Integer mort = usuari.get("mort").asInt();
-				final String representant = usuari.get("representant").asText();
-				// final String playerName = usuari.get("playerName").asText();
-				// this.logger.info(nom);
-				/**
-				final Map newPlayerData = new HashMap();
-				Integer zero = 0;
-				Boolean tru = Boolean.TRUE;
-				newPlayerData.put(DaHouse.BETS, zero);
-				newPlayerData.put(DaHouse.HANDLE, "---");
-				newPlayerData.put(DaHouse.PLAYER_ALIVE, tru);
-				newPlayerData.put(DaHouse.ROUND_KILLED, zero);
-				newPlayers.put(nomNormal, newPlayerData);
-				*/
+				final Integer juga = usuari.get(JUTGE_PLAYS).asInt();
+				final Integer mort = usuari.get(JUTGE_DEAD).asInt();
+				final String representant = usuari.get(JUTGE_CONTESTANT).asText();
 				final Map playerData = players.get(nomNormal);
 				if (playerData == null) continue;
 				final Boolean isAlive = (Boolean)playerData.get(DaHouse.PLAYER_ALIVE);
@@ -221,7 +243,7 @@ public class BetService {
 				}
 				// update handle too
 				final String handle = (String)playerData.get(DaHouse.HANDLE);
-				if (!"null".equals(representant) && !handle.equals(representant)) {
+				if (!JUTGE_NO_HANDLE.equals(representant) && !handle.equals(representant)) {
 					playerData.put(DaHouse.HANDLE, representant);
 					update = true;
 				}
@@ -246,7 +268,7 @@ public class BetService {
 							if (bet.getActive()) {
 								final Map playerData = players.get(player);
 								// player could die next iteration and still be alive
-								final Boolean isAlive = (Boolean)playerData.get(DaHouse.PLAYER_ALIVE) ? true : (Integer)playerData.get(DaHouse.ROUND_KILLED) <= k;
+								final Boolean isAlive = (Boolean)playerData.get(DaHouse.PLAYER_ALIVE) ? true : (Integer)playerData.get(DaHouse.ROUND_KILLED) > k;
 								// Per type basis
 								if (bet instanceof EnduranceBet) {
 									final EnduranceBet enduranceBet = (EnduranceBet)bet;
@@ -255,8 +277,9 @@ public class BetService {
 										if (isAlive) {
 											// user wins
 											final Double balance = this.getCurrentBalance(enduranceBet, daHouse);
+											final Double daHousePays = balance - enduranceBet.getKudos();
 											bill.setKudos(bill.getKudos() + balance);
-											daHouse.setKudos(daHouse.getKudos() - balance);
+											daHouse.setKudos(daHouse.getKudos() - daHousePays);
 											enduranceBet.setBalance(BetUtils.formatDouble(balance));
 											enduranceBet.setWon(Boolean.TRUE);
 											final Integer userBetsOnPlayer = this.activeBetsOnPlayer(player, bill);
@@ -299,14 +322,84 @@ public class BetService {
 			this.logger.error(e.getMessage());
 			return false;
 		}
-		/**
-		daHouse.setTotalPlayers(newPlayers.size());
-		daHouse.setPlayers(newPlayers);
-		this.daHouseRepository.save(daHouse);
-		*/
+		this.logger.info("BetService.updateDaHouse OK!");
 		return true;
 	}
 	
+	/**
+	 * Big Fat Warning!!! Run this function if you want to reset the database. 
+	 * To ensure data integrity, all user bills will be restored to default: 1000 kudos, no bets 
+	 * 
+	 * @param jsonData Data to feed into the initial daHouse Master Document.
+	 * Should include the curent round along with all players' data
+	 * @return true unless an exception jumps due to JSON parsing
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public boolean initDaHouse(final String jsonData) {
+		this.logger.info("BetService.initDaHouse");
+		final Integer zero = 0;
+		final DaHouse daHouse = new DaHouse();
+		daHouse.setId(BetUtils.MASTA_HOUSE);
+		daHouse.setKudos(zero.doubleValue());
+		daHouse.setBetMakers(zero);
+		Integer contestants = 0;
+		Integer totalPlayers = 0;
+		Integer playersDown = 0;
+		final Map<String, Map> newPlayers = new HashMap<String, Map>();
+		try {
+			// Parse JSON
+			final ObjectMapper mapper = new ObjectMapper();
+			final JsonNode actualObj = mapper.readTree(jsonData);
+			final Integer rondaActual = actualObj.get(JUTGE_CURRENT_ROUND).asInt();
+			// Iterate users
+			final JsonNode usuaris = actualObj.get(JUTGE_USERS);
+			for (int i = 0; i < usuaris.size(); i++) {
+				final JsonNode usuari = usuaris.get(i);
+				final String nom = usuari.get(JUTGE_NAME).asText();
+				final String nomNormal = RacoUtils.normalitzaNom(nom);
+				final Integer juga = usuari.get(JUTGE_PLAYS).asInt();
+				final Integer mort = usuari.get(JUTGE_DEAD).asInt();
+				final String representant = usuari.get(JUTGE_CONTESTANT).asText();
+				final Boolean hasPlayer = JUTGE_NO_HANDLE.equals(representant);
+				final Boolean alive = juga == 1;
+				final Map newPlayerData = new HashMap();
+				newPlayerData.put(DaHouse.BETS, zero);
+				newPlayerData.put(DaHouse.HANDLE, hasPlayer ? BetUtils.NO_PLAYER : representant);
+				newPlayerData.put(DaHouse.PLAYER_ALIVE, alive);
+				newPlayerData.put(DaHouse.ROUND_KILLED, mort);
+				newPlayers.put(nomNormal, newPlayerData);
+				if (hasPlayer) contestants++;
+				if (!alive) playersDown++;
+				totalPlayers++;
+			}
+			// save daHouse
+			daHouse.setPlayers(newPlayers);
+			daHouse.setContestants(contestants);
+			daHouse.setPlayersDown(playersDown);
+			daHouse.setTotalPlayers(totalPlayers);
+			daHouse.setCurrentRound(rondaActual);
+			this.daHouseRepository.save(daHouse);
+			// reset everybody's bets
+			final List<UserAccount> usersList = this.userRepository.findAll();
+			final Iterator<UserAccount> iterator = usersList.iterator();
+			while (iterator.hasNext()) {
+				final UserAccount userAccount = iterator.next();
+				final Bill bill = new Bill();
+				bill.setKudos(BetUtils.INITIAL_CREDIT);
+				bill.setBets(new ArrayList<BaseBet>());
+				bill.setActiveBets(0);
+				userAccount.setBill(bill);
+				this.userRepository.save(userAccount);
+			}
+		} catch(Exception e) {
+			this.logger.error(e.getMessage());
+			return false;
+		}
+		this.logger.info("BetService.initDaHouse OK!");
+		return true;
+	}
+	
+	// Duh!
 	private Integer activeBetsOnPlayer(final String player, final Bill bill) {
 		Integer val = 0;
 		for (BaseBet bet : bill.getBets()) if (bet.getActive() && bet.getPlayer().equals(player)) val++;

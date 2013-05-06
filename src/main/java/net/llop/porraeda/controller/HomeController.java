@@ -34,7 +34,6 @@ import net.llop.porraeda.service.BetService;
 import net.llop.porraeda.service.EmailService;
 import net.llop.porraeda.service.UserService;
 import net.llop.porraeda.util.BetUtils;
-import net.llop.porraeda.util.RacoUtils;
 import net.llop.porraeda.util.Routes;
 import net.llop.porraeda.util.ValidationUtils;
 import net.llop.recaptcha.ReCaptchaUtils;
@@ -51,7 +50,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * 
+ * Handles requests for pretty much everything.
  * @author Llop
  * 
  * Remember restful routing lessons:
@@ -160,7 +159,7 @@ public class HomeController {
 		// Do actual reset
 		this.userService.reset(userAccount);
 		this.emailService.sendPasswordResetMail(userAccount);
-		model.addAttribute("userName", RacoUtils.normalitzaNom(userAccount.getUsername()));
+		model.addAttribute("userName", userAccount.getUsername());
 		return "signup/reset-ok";
 	}
 	

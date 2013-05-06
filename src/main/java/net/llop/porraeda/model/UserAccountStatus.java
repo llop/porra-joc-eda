@@ -19,6 +19,11 @@
  */
 package net.llop.porraeda.model;
 
+/**
+ * Guessed from sparse documentation! 
+ * What is my user status?
+ * @author Llop
+ */
 public enum UserAccountStatus {
 	STATUS_PENDING, STATUS_APPROVED, STATUS_DISABLED, STATUS_PENDING_NOPASSWORD;
 }

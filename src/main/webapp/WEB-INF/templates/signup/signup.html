@@ -17,11 +17,23 @@
 		</section>
 		<!-- signup form -->
    		<section class="right-box">
+   			<script th:inline="javascript">
+		   	/*<![CDATA[*/ 
+	        	function onSubmitHandler() {
+		   			$('#signup').attr('disabled', 'disabled');
+	        		$('#loader').show();
+		   		}
+			/*]]>*/
+		   	</script>
+   			<div id="loader">
+   				<div><img alt="Loading" src="http://dl.dropbox.com/u/156484492/porraeda/img/loader.gif" /></div>
+   				<div><span>Tingues paciència siusplau!</span></div>
+   			</div>
    			<div class="p-3"><span class="large-text">Participa en la porra!</span></div>
-   			<form th:action="${#r.r('home', 'signupPost')}" method="post">
+   			<form id="f-form" th:action="${#r.r('home', 'signupPost')}" method="post" onsubmit="onSubmitHandler()">
    			<div class="p-3">
 	            <div class="t-r-a-n-l"><label for="usr">Nom d'usuari:</label></div>
-	            <div class="t-r-a-n-r"><input type="text" id="usr" name="usr" autofocus="autofocus" /></div>
+	            <div class="t-r-a-n-r"><input type="text" id="usr" name="usr" autofocus="autofocus" maxlength="16" /></div>
 	            <div class="t-r-a-n-l"><label for="mil">E-mail:</label></div>
 	            <div class="t-r-a-n-r"><input type="email" id="mil" name="mil" /></div>
 				<div class="t-r-a-n-cap"><div recaptcha:recaptcha=""></div></div>

@@ -47,6 +47,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * Sends emails via Raco webmail
+ * @author Llop
+ */
 @Service
 public class EmailService {
 
@@ -63,7 +67,7 @@ public class EmailService {
 		} catch (Exception e) { this.logger.error(e.getMessage()); }
 	}
 	
-	public void sendActivationMail(final UserAccount userAccount) { //, final String password) {
+	public void sendActivationMail(final UserAccount userAccount) {
 		this.logger.info("EmailService.sendActivationMail");
 		try {
 			final String message = "Hola, " + RacoUtils.normalitzaNom(userAccount.getUsername()) + "!\n\n" +
@@ -75,7 +79,16 @@ public class EmailService {
 		} catch (Exception e) { this.logger.error(e.getMessage()); }
 	}
 	
-	private void sendMail(final UserAccount userAccount, final String message) throws Exception { //, final String password) {
+	/**
+	 * Mighty delicate a process it is to send an email through the Raco webmail frontend. Let me break it down:
+	 * You need to log in as you'd normally do in the Raco. After a couple of redirects to the CAS server, you should be inside.
+	 * Then you issue a GET for the mail compose form. The response contains a form token to be used in the actual multipart POST that should send the mail.
+	 * The minute they change the login system or the webmail styles, this'll probably break down LOL: Let's hope they keep it this way til the Joc d'EDA is over
+	 * @param userAccount user to send the mail to
+	 * @param message the message body
+	 * @throws Exception should anything crash
+	 */
+	private void sendMail(final UserAccount userAccount, final String message) throws Exception {
 		// Enviar mail pel Raco
 		// Authenticate
 		final List<NameValuePair> params = new ArrayList<>();
@@ -100,12 +113,12 @@ public class EmailService {
 	    });
 		HttpResponse response = httpClient.execute(post);
 		HttpEntity entity = response.getEntity();
-		String responseBody = EntityUtils.toString(entity);
+		EntityUtils.consumeQuietly(entity);
 		// get form page
 		final HttpGet get = new HttpGet("https://webmail.fib.upc.es/horde/imp/compose.php?thismailbox=INBOX&uniq=" + System.currentTimeMillis());
 		response = httpClient.execute(get);
 		entity = response.getEntity();
-		responseBody = EntityUtils.toString(entity);
+		String responseBody = EntityUtils.toString(entity);
 		// Find form action with uniq parameter 
 		Pattern pattern = Pattern.compile(RacoUtils.RACO_MAIL_ACTION_PATTERN);
 		Matcher matcher = pattern.matcher(responseBody);
@@ -152,8 +165,6 @@ public class EmailService {
 		response = httpClient.execute(post);
 		EntityUtils.consumeQuietly(entity);
 		this.logger.info("EmailService.sendMail done");
-		//entity = response.getEntity();
-		//responseBody = EntityUtils.toString(entity);
 	}
 	
 }

@@ -28,6 +28,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * A bunch of calculated fields and stuff to keep state between all bets.
+ * It should know about the round we're at currently.
+ * And the players in the competition.
+ * @author Llop
+ */
 @Document
 public class DaHouse {
 	

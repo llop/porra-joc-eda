@@ -17,8 +17,20 @@
 		
 		<!-- login form -->
    		<section class="right-box">
+   			<script th:inline="javascript">
+		   	/*<![CDATA[*/ 
+	        	function onSubmitHandler() {
+		   			$('#login-button').attr('disabled', 'disabled');
+	        		$('#loader').show();
+		   		}
+			/*]]>*/
+		   	</script>
+   			<div id="loader">
+   				<div><img alt="Loading" src="http://dl.dropbox.com/u/156484492/porraeda/img/loader.gif" /></div>
+   				<div><span>Tingues paciència siusplau!</span></div>
+   			</div>
    			<div class="p-3"><span class="large-text">Accedeix al teu panell</span></div>
-			<form th:action="@{/j_spring_security_check}" method="post">
+			<form id="f-form" th:action="@{/j_spring_security_check}" method="post" onsubmit="onSubmitHandler()">
 			<div class="p-3">
 	            <div class="t-r-a-n-l"><label for="j_username">Nom d'usuari:</label></div>
 				<div class="t-r-a-n-r"><input type="text" id="j_username" name="j_username" autofocus="autofocus" /></div>

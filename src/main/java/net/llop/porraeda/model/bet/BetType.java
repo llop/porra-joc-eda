@@ -19,6 +19,10 @@
  */
 package net.llop.porraeda.model.bet;
 
+/**
+ * What kind of bets can I make?
+ * @author Llop
+ */
 public enum BetType {
 	AGUANTA, SEMIS, FINAL;
 }

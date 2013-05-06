@@ -45,6 +45,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
+/**
+ * Bet requests handler.
+ * @author Llop
+ */
 @Controller
 @RequestMapping(Routes.BETS)
 public class BetController {

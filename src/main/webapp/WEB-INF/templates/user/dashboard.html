@@ -41,7 +41,10 @@
 		var i = 0, pathVars = [ kudosInput.val(), playerSelect.val(), rondasInput.val() ];
 		return enduranceBetRateUrl.replace(/{.+?}/g, function() { return pathVars[i++]; });
 	}
-	function getBetRateDone(data, textStatus, jqxhr) { betRate.text(data.rate); }
+	function getBetRateDone(data, textStatus, jqxhr) { 
+		if (data.errors) alertErrors(data.errors);
+		else betRate.text(data.rate); 
+	}
    	function getBetRateFail(jqxhr, textStatus, errorThrown) { alert("Error consultant la tassa!"); }
    	function getBetRate() {
    		jqXHR = $.ajax({ url: produceEnduranceBetRateUrl(), dataType: 'json', type: 'GET', contentType: "application/json;charset=UTF-8" })
@@ -67,7 +70,11 @@
    		var newHtml = "";
    		for (i in betsData) {
    			var bet = betsData[i];
-   			newHtml += "<div class='bets-made-row'>";
+   			newHtml += "<div class='";
+   			if (bet.active) newHtml += "bets-active-row";
+ 			else if (bet.won) newHtml += "bets-won-row";
+ 			else newHtml += "bets-lost-row";
+ 			newHtml += "'>";
    			// Start bet info
 			newHtml += "<div>";
 			newHtml += "<span class='w-s'>" + bet.kudos + "</span><span> kudos a que </span><span class='w-s'>" + bet.player + "</span>";
@@ -113,7 +120,6 @@
    		rondasInput.change(function(event) { getBetRate(); });
    		kudosInput.keyup(function(event) { digitsOnly(kudosInput); });
    		$("#new-bet").click(makeABet);
-   		getBetRate();
    		updateDatas();
    	});
    	/*]]>*/

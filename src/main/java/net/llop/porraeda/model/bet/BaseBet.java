@@ -21,7 +21,10 @@ package net.llop.porraeda.model.bet;
 
 import java.util.Date;
 
-
+/**
+ * Base class for bets. Should be abstract and protected attrs!
+ * @author Llop
+ */
 public class BaseBet {
 
 	private String type;

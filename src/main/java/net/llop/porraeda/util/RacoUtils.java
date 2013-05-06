@@ -24,7 +24,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-
+/**
+ * Raco utility methods + constants
+ * @author Llop
+ */
 public class RacoUtils {
 	
 	public static final String ENV_RACO_USR = "RACO_USR";

@@ -41,10 +41,11 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-/*
-Extend AbstractUserDetailsAuthenticationProvider when you want to
-prehandle authentication, as in throwing custom exception messages,
-checking status, etc.
+/**
+ * Adapted from the springsecurity + mongodb example
+ * 
+ * Extend AbstractUserDetailsAuthenticationProvider when you want to prehandle authentication, as in throwing custom exception messages, checking status, etc.
+ * @author Llop
  */
 @Component
 public class MongoDBAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {

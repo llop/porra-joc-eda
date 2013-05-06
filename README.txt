@@ -9,7 +9,7 @@ On hi trobaràs més informació:
  
 	http://www.porra-joc-eda.tk/faq
     
-I la web del concurs:
+La web del concurs:
 
 	http://battle-royale.jutge.org/
 	

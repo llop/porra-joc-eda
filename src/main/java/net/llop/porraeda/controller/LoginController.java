@@ -29,6 +29,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * Handles the login error request issued by springsecurity
+ * @author Llop
+ */
 @Controller
 @RequestMapping(Routes.LOGIN)
 public class LoginController {

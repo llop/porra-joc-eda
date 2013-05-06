@@ -1,0 +1,4 @@
+versio 0.3.2
+============
+
+- Primera versió pública
