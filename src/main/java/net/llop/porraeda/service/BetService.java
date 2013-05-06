@@ -364,7 +364,7 @@ import org.springframework.stereotype.Service;
 				final Boolean alive = juga == 1;
 				final Map newPlayerData = new HashMap();
 				newPlayerData.put(DaHouse.BETS, zero);
-				newPlayerData.put(DaHouse.HANDLE, hasPlayer ? BetUtils.NO_PLAYER : representant);
+				newPlayerData.put(DaHouse.HANDLE, hasPlayer ? representant : BetUtils.NO_PLAYER);
 				newPlayerData.put(DaHouse.PLAYER_ALIVE, alive);
 				newPlayerData.put(DaHouse.ROUND_KILLED, mort);
 				newPlayers.put(nomNormal, newPlayerData);
