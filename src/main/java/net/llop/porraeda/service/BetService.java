@@ -360,7 +360,7 @@ import org.springframework.stereotype.Service;
 				final Integer juga = usuari.get(JUTGE_PLAYS).asInt();
 				final Integer mort = usuari.get(JUTGE_DEAD).asInt();
 				final String representant = usuari.get(JUTGE_CONTESTANT).asText();
-				final Boolean hasPlayer = JUTGE_NO_HANDLE.equals(representant);
+				final Boolean hasPlayer = !JUTGE_NO_HANDLE.equals(representant);
 				final Boolean alive = juga == 1;
 				final Map newPlayerData = new HashMap();
 				newPlayerData.put(DaHouse.BETS, zero);
@@ -368,7 +368,7 @@ import org.springframework.stereotype.Service;
 				newPlayerData.put(DaHouse.PLAYER_ALIVE, alive);
 				newPlayerData.put(DaHouse.ROUND_KILLED, mort);
 				newPlayers.put(nomNormal, newPlayerData);
-				if (hasPlayer) contestants++;
+				if (alive && hasPlayer) contestants++;
 				if (!alive) playersDown++;
 				totalPlayers++;
 			}
