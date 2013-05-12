@@ -31,6 +31,8 @@ public class BetUtils {
 
 	public static final String MASTA_HOUSE = "MASTER";
 	public static final String DA_HOUSE = "daHouse";
+	public static final String DA_HOUSE_STATS = "daHouseStats";
+	public static final String NEWS_UPDATES = "newsUpdates";
 	
 	public static final String NO_PLAYER = "---";
 	

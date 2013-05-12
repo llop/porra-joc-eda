@@ -59,7 +59,7 @@ public class EmailService {
 	public void sendPasswordResetMail(final UserAccount userAccount) {
 		this.logger.info("EmailService.sendPasswordResetMail");
 		try {
-			final String message = "Hola, " + RacoUtils.normalitzaNom(userAccount.getUsername()) + "!\n\n" +
+			final String message = "Hola, " + userAccount.getUsername() + "!\n\n" +
 					"Accedeix a la seguent adressa per entrar un nou password: " +
 					"http://www.porra-joc-eda.tk/apuntar-se/activar/" + URLEncoder.encode(userAccount.getActivationToken(), "UTF-8") + "\n\n" + 
 					"Salutacions, equip porra-joc-eda";
@@ -70,7 +70,7 @@ public class EmailService {
 	public void sendActivationMail(final UserAccount userAccount) {
 		this.logger.info("EmailService.sendActivationMail");
 		try {
-			final String message = "Hola, " + RacoUtils.normalitzaNom(userAccount.getUsername()) + "!\n\n" +
+			final String message = "Hola, " + userAccount.getUsername() + "!\n\n" +
 				"El teu nom d'usuari es: " + userAccount.getUsername() + "\n" + 
 				"Introdueix un password per activar el teu usuari en aquesta adressa: " +
 				"http://www.porra-joc-eda.tk/apuntar-se/activar/" + URLEncoder.encode(userAccount.getActivationToken(), "UTF-8") + "\n\n" + 

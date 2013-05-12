@@ -1,5 +1,0 @@
-update dahouse field:
-	contestants = num estudiants que han passat el tonto
-	
-
-HomeController.userDashboard

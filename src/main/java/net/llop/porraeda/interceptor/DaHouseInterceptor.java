@@ -20,10 +20,13 @@
 package net.llop.porraeda.interceptor;
 
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.llop.porraeda.model.DaHouse;
+import net.llop.porraeda.model.Stats;
 import net.llop.porraeda.service.BetService;
 import net.llop.porraeda.util.BetUtils;
 
@@ -45,7 +48,11 @@ public class DaHouseInterceptor extends HandlerInterceptorAdapter  {
 	@Override public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
 		this.logger.info("DaHouseInterceptor.preHandle");
 		final DaHouse daHouse = this.betService.getDaMastaHouse();
+		final Stats stats = this.betService.getDaMastaHouseStats();
+		final List<String> newsUpdates = this.betService.getNewsUpdates(stats);
 		request.setAttribute(BetUtils.DA_HOUSE, daHouse);
+		request.setAttribute(BetUtils.DA_HOUSE_STATS, stats);
+		request.setAttribute(BetUtils.NEWS_UPDATES, newsUpdates);
 		return true;
 	}
 	

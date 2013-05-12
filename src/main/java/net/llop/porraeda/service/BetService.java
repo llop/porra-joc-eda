@@ -26,19 +26,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.llop.porraeda.model.DaHouse;
+import net.llop.porraeda.model.Stats;
 import net.llop.porraeda.model.UserAccount;
 import net.llop.porraeda.model.bet.BaseBet;
 import net.llop.porraeda.model.bet.BetType;
 import net.llop.porraeda.model.bet.Bill;
 import net.llop.porraeda.model.bet.EnduranceBet;
 import net.llop.porraeda.repository.DaHouseRepository;
+import net.llop.porraeda.repository.StatsRepository;
 import net.llop.porraeda.repository.UserAccountRepository;
 import net.llop.porraeda.util.BetUtils;
 import net.llop.porraeda.util.CastUtils;
 import net.llop.porraeda.util.RacoUtils;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -64,8 +68,9 @@ import org.springframework.stereotype.Service;
 	
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired private DaHouseRepository daHouseRepository;
+	@Autowired private StatsRepository statsRepository;
 	@Autowired private UserAccountRepository userRepository;
 	
 	
@@ -74,24 +79,100 @@ import org.springframework.stereotype.Service;
 		return this.daHouseRepository.findOne(BetUtils.MASTA_HOUSE);
 	}
 	
-	public void makeABet(final UserAccount userAccount, final BaseBet bet, final DaHouse daHouse) {
+	public Stats getDaMastaHouseStats() {
+		this.logger.info("BetService.getDaMastaHouseStats");
+		return this.statsRepository.findOne(BetUtils.MASTA_HOUSE);
+	}
+	
+	public void makeABet(final UserAccount userAccount, final BaseBet bet, final DaHouse daHouse, final Stats stats) {
 		this.logger.info("BetService.makeABet");
+		// update user bill
 		final Bill bill = userAccount.getBill();
+		this.incrementIfPlayerFirst(bill, bet, daHouse);
 		bill.setKudos(bill.getKudos() - bet.getKudos());
 		bill.setActiveBets(bill.getActiveBets() + 1);
 		final List<BaseBet> bets = bill.getBets();
 		bets.add(0, bet);
-		this.incrementIfPlayerFirst(bets, bet, daHouse);
 		this.userRepository.save(userAccount);
+		// update da house stats
+		final Double currentlyBetKudos = stats.getCurrentlyBetKudos() + bet.getKudos();
+		final Long totalActiveBets = stats.getTotalActiveBets() + 1;
+		final Double averageKudosForBet = currentlyBetKudos / totalActiveBets;
+		stats.setCurrentlyBetKudos(currentlyBetKudos);
+		stats.setTotalActiveBets(totalActiveBets);
+		stats.setAverageKudosForBet(averageKudosForBet);
+		updateMostVotedPlayersStats(stats, daHouse);
+		this.statsRepository.save(stats);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void updateMostVotedPlayersStats(final Stats stats, final DaHouse daHouse) {
+		final List<Pair<Integer, String>> votersForPlayers = new ArrayList<>();
+		final Set<Entry<String, Map>> players = daHouse.getPlayers().entrySet();
+		for (final Entry<String, Map> entry : players) {
+			final String playerName = entry.getKey();
+			final Map playerData = entry.getValue();
+			final Boolean isAlive = (Boolean)playerData.get(DaHouse.PLAYER_ALIVE);
+			final Integer numVotersForPlayer = CastUtils.toInteger(playerData.get(DaHouse.BETS));
+			if (isAlive && numVotersForPlayer > 0) {
+				final Pair<Integer, String> votersForPlayer = Pair.of(numVotersForPlayer, playerName);
+				votersForPlayers.add(votersForPlayer);
+			}
+		}
+		Collections.sort(votersForPlayers);
+		Collections.reverse(votersForPlayers);
+		int counter = 0;
+		final Integer totalBetMakers = daHouse.getBetMakers();
+		final List<Pair<String, String>> mostVotedPlayers = new ArrayList<>();
+		final Iterator<Pair<Integer, String>> iter = votersForPlayers.iterator();
+		while (iter.hasNext() && counter < Stats.MAX_MOST_VOTED_PLAYERS) {
+			final Pair<Integer, String> votersForPlayer = iter.next();
+			final String playerName = votersForPlayer.getRight();
+			final String playerHandle = (String)daHouse.getPlayers().get(playerName).get(DaHouse.HANDLE);
+			final Integer numVotersForPlayer = votersForPlayer.getLeft();
+			final Double percentage = 100d * numVotersForPlayer / totalBetMakers;
+			final Pair<String, String> mostVotedPlayer = Pair.of(playerName + " (<strong>" + playerHandle + "</strong>)", BetUtils.formatDouble(percentage));
+			mostVotedPlayers.add(mostVotedPlayer);
+			counter++;
+		}
+		stats.setMostVotedPlayers(mostVotedPlayers);
 	}
 	
+	public List<String> getNewsUpdates(final Stats stats) {
+		final List<String> newsUpdates = new ArrayList<>();
+		final String totalKudosWon = "Els usuaris han guanyat <span class='o-s-b'>" + stats.getTotalKudosWon().intValue() + "</span> kudos";
+		newsUpdates.add(totalKudosWon);
+		final String currentlyBetKudos = "Ara mateix hi ha <span class='o-s-b'>" + stats.getCurrentlyBetKudos().intValue() + "</span> kudos en joc";
+		newsUpdates.add(currentlyBetKudos);
+		if (stats.getTotalActiveBets() != 0) {
+			final Double averageKudosPerBetDouble = stats.getCurrentlyBetKudos() / stats.getTotalActiveBets();
+			final String averageKudosPerBet = "La mitja de kudos per aposta és de <span class='o-s-b'>" + averageKudosPerBetDouble.intValue() + "</span>";
+			newsUpdates.add(averageKudosPerBet);
+		}
+		if (stats.getTotalFinishedBets() != 0) {
+			final Double wonBetsPercentageDouble = 100d * stats.getTotalWonBets() / stats.getTotalFinishedBets();
+			final String wonBetsPercentage = "Els usuaris han encertat el <span class='o-s-b'>" + BetUtils.formatDouble(wonBetsPercentageDouble) + "%</span> de les apostes";
+			newsUpdates.add(wonBetsPercentage);
+		}
+		return newsUpdates;
+	}
+	
+	private boolean hasBetsOnPlayer(final String playerName, final Bill bill) {
+		final List<BaseBet> bets = bill.getBets();
+		for (BaseBet betTemp : bets) {
+			if (betTemp.getActive() && betTemp.getPlayer().equals(playerName)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void incrementIfPlayerFirst(final List<BaseBet> bets, final BaseBet bet, final DaHouse daHouse) {
-		if (bets.size() == 1) daHouse.setBetMakers(daHouse.getBetMakers() + 1);
-		int counter = 0;
+	private void incrementIfPlayerFirst(final Bill bill, final BaseBet bet, final DaHouse daHouse) {
+		// add 1 bet maker if this is their first bet
+		if (bill.getActiveBets() == 0) daHouse.setBetMakers(daHouse.getBetMakers() + 1);
+		// add 1 to player's bets if this is user's first bet on player
 		final String playerName = BetUtils.sanitizePlayerName(bet.getPlayer());
-		for (BaseBet betTemp : bets) if (betTemp.getPlayer().equals(playerName)) counter++;
-		if (counter == 1) {
+		if (!this.hasBetsOnPlayer(playerName, bill)) {
 			final Map map = daHouse.getPlayers().get(playerName);
 			map.put(DaHouse.BETS, CastUtils.toInteger(map.get(DaHouse.BETS)) + 1);
 			this.daHouseRepository.save(daHouse);
@@ -109,6 +190,30 @@ import org.springframework.stereotype.Service;
 		Integer estudiantsApostant = daHouse.getBetMakers();
 		String playerName = BetUtils.sanitizePlayerName(bet.getPlayer());
 		Integer estudiantsApostenPelMateix = CastUtils.toInteger(daHouse.getPlayers().get(playerName).get(DaHouse.BETS));
+		if (estudiantsApostant == 0) estudiantsApostant = 1;
+		if (estudiantsApostenPelMateix == 0) estudiantsApostenPelMateix = 1;
+		final Double factor = (double)estudiantsApostenPelMateix / estudiantsApostant;
+		final String betType = bet.getType();
+		if (BetType.AGUANTA.name().equals(betType)) {
+			EnduranceBet enduranceBet = (EnduranceBet)bet;
+			Integer n = daHouse.getContestants() - enduranceBet.getBetOnRound();
+			Integer f = n - enduranceBet.getEnduresRounds();
+			while (n > f) odds *= 1d - (1d / n--);
+		} else if (BetType.SEMIS.name().equals(betType)) odds /= 4d;
+		else if (BetType.FINAL.name().equals(betType)) odds /= 16d;
+		odds += (1d - odds) * factor;
+		return 1d / odds;
+	}
+	
+	public Double getFutureBetRate(final UserAccount userAccount, final BaseBet bet, final DaHouse daHouse) {
+		this.logger.info("BetService.getFutureBetRate");
+		final Bill bill = userAccount.getBill();
+		Double odds = 1d;
+		Integer estudiantsApostant = daHouse.getBetMakers();
+		if (bill.getActiveBets() == 0) ++estudiantsApostant;
+		String playerName = BetUtils.sanitizePlayerName(bet.getPlayer());
+		Integer estudiantsApostenPelMateix = CastUtils.toInteger(daHouse.getPlayers().get(playerName).get(DaHouse.BETS));
+		if (!hasBetsOnPlayer(playerName, bill)) ++estudiantsApostenPelMateix;
 		if (estudiantsApostant == 0) estudiantsApostant = 1;
 		if (estudiantsApostenPelMateix == 0) estudiantsApostenPelMateix = 1;
 		final Double factor = (double)estudiantsApostenPelMateix / estudiantsApostant;
@@ -211,7 +316,7 @@ import org.springframework.stereotype.Service;
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public boolean updateDaHouse(final String jsonData, final DaHouse daHouse) {
+	public boolean updateDaHouse(final String jsonData, final DaHouse daHouse, final Stats stats) {
 		this.logger.info("BetService.updateDaHouse");
 		try {
 			// Parse JSON
@@ -223,6 +328,7 @@ import org.springframework.stereotype.Service;
 			final boolean roundAdvanced = rondaActual > daHouse.getCurrentRound();
 			boolean update = roundAdvanced;
 			// Iterate users
+			Integer playersDown = daHouse.getPlayersDown();
 			final JsonNode usuaris = actualObj.get(JUTGE_USERS);
 			for (int i = 0; i < usuaris.size(); i++) {
 				final JsonNode usuari = usuaris.get(i);
@@ -238,7 +344,7 @@ import org.springframework.stereotype.Service;
 				if (isAlive && juga == 0) {
 					playerData.put(DaHouse.PLAYER_ALIVE, Boolean.FALSE);
 					playerData.put(DaHouse.ROUND_KILLED, mort);
-					daHouse.setPlayersDown(daHouse.getPlayersDown() + 1);
+					playersDown++;
 					update = true;
 				}
 				// update handle too
@@ -250,6 +356,10 @@ import org.springframework.stereotype.Service;
 			}
 			// if round advanced, check all player bets
 			if (roundAdvanced) {
+				Integer totalWonBets = stats.getTotalWonBets();
+				Integer totalFinishedBets = stats.getTotalFinishedBets();
+				Long totalActiveBets = stats.getTotalActiveBets();
+				Double currentlyBetKudos = stats.getCurrentlyBetKudos();
 				final List<UserAccount> usersList = this.userRepository.findAll();
 				// ok, so it is possible to have more than 1 round within a minute (expected time between updates)
 				// need to handle one round at a time so as not to break (bets on player) / (total bets) ratio, which is used to calculate bet value (in getCurrentBalance) for endurance bets
@@ -280,24 +390,29 @@ import org.springframework.stereotype.Service;
 											final Double daHousePays = balance - enduranceBet.getKudos();
 											bill.setKudos(bill.getKudos() + balance);
 											daHouse.setKudos(daHouse.getKudos() - daHousePays);
+											stats.setTotalKudosWon(stats.getTotalKudosWon() + daHousePays);
 											enduranceBet.setBalance(BetUtils.formatDouble(balance));
 											enduranceBet.setWon(Boolean.TRUE);
-											final Integer userBetsOnPlayer = this.activeBetsOnPlayer(player, bill);
-											if (userBetsOnPlayer == 1) {
-												// This user's last bet on the player -subtract 1 from playerData.get(DaHouse.BETS)
-												final Integer betsOnPlayer = CastUtils.toInteger(playerData.get(DaHouse.BETS));
-												playerData.put(DaHouse.BETS, betsOnPlayer - 1);
-											}
+											totalWonBets++;
 										} else {
 											// da house wins+
 											daHouse.setKudos(daHouse.getKudos() + enduranceBet.getKudos());
 											enduranceBet.setBalance(enduranceBet.getKudos().toString());
 											enduranceBet.setWon(Boolean.FALSE);
-											// screw updating bets on this player (playerData.get(DaHouse.BETS)) -we don't need that number any more
+										}
+										final Integer userBetsOnPlayer = this.activeBetsOnPlayer(player, bill);
+										if (userBetsOnPlayer == 1) {
+											// This user's last bet on the player -subtract 1 from playerData.get(DaHouse.BETS)
+											final Integer betsOnPlayer = CastUtils.toInteger(playerData.get(DaHouse.BETS));
+											playerData.put(DaHouse.BETS, betsOnPlayer - 1);
 										}
 										bet.setActive(Boolean.FALSE);
 										bill.setActiveBets(bill.getActiveBets() - 1);
 										updateUser = true;
+										// update stats
+										currentlyBetKudos -= enduranceBet.getKudos();
+										totalActiveBets--;
+										totalFinishedBets++;
 									}
 								} else {
 									// TODO: Improve semis bet type
@@ -312,9 +427,18 @@ import org.springframework.stereotype.Service;
 					}
 					daHouse.setBetMakers(betMakers);
 				}
+				// save new stats
+				stats.setCurrentlyBetKudos(currentlyBetKudos);
+				stats.setTotalActiveBets(totalActiveBets);
+				stats.setTotalFinishedBets(totalFinishedBets);
+				stats.setTotalWonBets(totalWonBets);
+				stats.setAverageKudosForBet(currentlyBetKudos / totalActiveBets);
+				updateMostVotedPlayersStats(stats, daHouse);
+				this.statsRepository.save(stats);
 			}
 			// Update current round and save
 			if (update) {
+				daHouse.setPlayersDown(playersDown);
 				daHouse.setCurrentRound(rondaActual);
 				this.daHouseRepository.save(daHouse);
 			}
@@ -337,16 +461,17 @@ import org.springframework.stereotype.Service;
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean initDaHouse(final String jsonData) {
 		this.logger.info("BetService.initDaHouse");
-		final Integer zero = 0;
-		final DaHouse daHouse = new DaHouse();
-		daHouse.setId(BetUtils.MASTA_HOUSE);
-		daHouse.setKudos(zero.doubleValue());
-		daHouse.setBetMakers(zero);
-		Integer contestants = 0;
-		Integer totalPlayers = 0;
-		Integer playersDown = 0;
-		final Map<String, Map> newPlayers = new HashMap<String, Map>();
 		try {
+			final Integer zero = 0;
+			final Double dZero = zero.doubleValue();
+			final DaHouse daHouse = new DaHouse();
+			daHouse.setId(BetUtils.MASTA_HOUSE);
+			daHouse.setKudos(dZero);
+			daHouse.setBetMakers(zero);
+			Integer contestants = 0;
+			Integer totalPlayers = 0;
+			Integer playersDown = 0;
+			final Map<String, Map> newPlayers = new HashMap<String, Map>();
 			// Parse JSON
 			final ObjectMapper mapper = new ObjectMapper();
 			final JsonNode actualObj = mapper.readTree(jsonData);
@@ -379,6 +504,17 @@ import org.springframework.stereotype.Service;
 			daHouse.setTotalPlayers(totalPlayers);
 			daHouse.setCurrentRound(rondaActual);
 			this.daHouseRepository.save(daHouse);
+			// reset stats
+			final Stats stats = new Stats();
+			stats.setId(BetUtils.MASTA_HOUSE);
+			stats.setCurrentlyBetKudos(dZero);
+			stats.setTotalKudosWon(dZero);
+			stats.setTotalActiveBets(zero.longValue());
+			stats.setAverageKudosForBet(dZero);
+			stats.setTotalWonBets(zero);
+			stats.setTotalFinishedBets(zero);
+			stats.setMostVotedPlayers(new ArrayList<Pair<String, String>>());
+			this.statsRepository.save(stats);
 			// reset everybody's bets
 			final List<UserAccount> usersList = this.userRepository.findAll();
 			final Iterator<UserAccount> iterator = usersList.iterator();

@@ -25,6 +25,7 @@ import java.security.cert.X509Certificate;
 import javax.servlet.http.HttpServletRequest;
 
 import net.llop.porraeda.model.DaHouse;
+import net.llop.porraeda.model.Stats;
 import net.llop.porraeda.service.BetService;
 import net.llop.porraeda.service.UserService;
 import net.llop.porraeda.util.BetUtils;
@@ -60,6 +61,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(Routes.UPDATE)
 public class UpdateController {
 	
+	private final static String JUTGE_UPDATE_URL = "https://battle-royale.jutge.org/info.php";
+	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired private UserService userService;
@@ -77,12 +80,13 @@ public class UpdateController {
 		    final ClientConnectionManager connectionManager = new PoolingClientConnectionManager(registry);
 			// Get data
 		    final HttpClient httpClient = new DefaultHttpClient(connectionManager);
-			final HttpGet get = new HttpGet("https://battle-royale.jutge.org/info.php");
+			final HttpGet get = new HttpGet(JUTGE_UPDATE_URL);
 			final HttpResponse response = httpClient.execute(get);
 			final HttpEntity entity = response.getEntity();
 			final String responseBody = EntityUtils.toString(entity);
 			final DaHouse daHouse = (DaHouse)request.getAttribute(BetUtils.DA_HOUSE);
-			this.betService.updateDaHouse(responseBody, daHouse);
+			final Stats stats = (Stats)request.getAttribute(BetUtils.DA_HOUSE_STATS);
+			this.betService.updateDaHouse(responseBody, daHouse, stats);
 			model.addAttribute("result", "Update OK");
 		} catch(Exception e) {
 			this.logger.error(e.getMessage());

@@ -37,7 +37,7 @@ public class Routes {
 	public static final String MAKE_A_BET = "/fer-aposta";
 	public static final String LOGIN = "/entrar";
 	public static final String ERROR = "/error";
-	public static final String BETS = "/apostas";
+	public static final String BETS = "/apostes";
 	public static final String ENDURANCE_BET = "/tipus/resistencia/kudos/{kudos}/jugador/{jugador}/rondes/{rondes}";
 	public static final String BASE_BET = "/tipus/{tipus}/kudos/{kudos}/jugador/{jugador}";
 	public static final String UPDATE = "/actualitzacions";

@@ -176,7 +176,7 @@ public class HomeController {
 		final DaHouse daHouse = (DaHouse)req.getAttribute(BetUtils.DA_HOUSE);
 		final List<String> alivePlayerNames = this.betService.getAlivePlayerNames(daHouse);
 		final Integer currentRound = daHouse.getCurrentRound();
-		final Integer maxEndureRounds = 100;  // TODO: update to currentRound - BetUtils.FINAL_PLAYERS;
+		final Integer maxEndureRounds = daHouse.getLastRound() - currentRound;
 		final UserAccount userAccount = (UserAccount)request.getAttribute(LoggedUserUtils.LOGGED_USER);
 		final Bill bill = userAccount.getBill();
 		final Integer kudosLeftInt = BetUtils.toInteger(bill.getKudos());

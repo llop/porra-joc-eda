@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import net.llop.porraeda.model.DaHouse;
+import net.llop.porraeda.model.Stats;
 import net.llop.porraeda.model.UserAccount;
 import net.llop.porraeda.model.bet.BaseBet;
 import net.llop.porraeda.model.bet.BetType;
@@ -42,11 +43,13 @@ import net.llop.porraeda.util.BetUtils;
 import net.llop.porraeda.util.Routes;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -71,6 +74,7 @@ public class UserController {
 		logger.info("UserController.makeABet");
 		final LinkedHashMap response = new LinkedHashMap();
 		final DaHouse daHouse = (DaHouse)request.getAttribute(BetUtils.DA_HOUSE);
+		final Stats stats = (Stats)request.getAttribute(BetUtils.DA_HOUSE_STATS);
 		final UserAccount userAccount = (UserAccount)request.getAttribute(LoggedUserUtils.LOGGED_USER); 
 		if (this.validateParams(userAccount, map, response, daHouse)) {
 			final String jugador = (String)map.get("jugador");
@@ -89,14 +93,14 @@ public class UserController {
 			bet.setType(tipus);
 			bet.setActive(Boolean.TRUE);
 			bet.setDate(new Date());
-			this.betService.makeABet(userAccount, bet, daHouse);
-			this.buildOkResponse(userAccount, daHouse, response);
+			this.betService.makeABet(userAccount, bet, daHouse, stats);
+			this.buildOkResponse(userAccount, daHouse, stats, response);
 		}
 		return response;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void buildOkResponse(final UserAccount userAccount, final DaHouse daHouse, final LinkedHashMap response) {
+	private void buildOkResponse(final UserAccount userAccount, final DaHouse daHouse, final Stats stats, final LinkedHashMap response) {
 		// Add bets data
 		final List betsData = new ArrayList();
 		final Iterator<BaseBet> iterator = userAccount.getBill().getBets().iterator();
@@ -131,10 +135,25 @@ public class UserController {
 		generalDataMap.put("alivePlayerNames", alivePlayerNames);
 		generalDataMap.put("activeBets", bill.getActiveBets());
 		response.put("generalData", generalDataMap);
-	}
+		
+		// add stats data
+		final List<Map<String, String>> mvPlayersList = new ArrayList<>();
+		final List<Pair<String, String>> mvPlayers = stats.getMostVotedPlayers();
+		for (Pair<String, String> mvPlayer : mvPlayers) {
+			Map<String, String> mvPlayerMap = new HashMap<>();
+			mvPlayerMap.put("name", mvPlayer.getLeft());
+			mvPlayerMap.put("popularity", mvPlayer.getRight());
+			mvPlayersList.add(mvPlayerMap);
+		}
+		response.put("mostPopularPlayers", mvPlayersList);
+		
+		// news-updates
+		List<String> newsUpdates = this.betService.getNewsUpdates(stats);
+		response.put("newsUpdates", newsUpdates);
+ 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private boolean validateParams(final UserAccount userAccount, LinkedHashMap request, final LinkedHashMap response, final DaHouse daHouse) {
+	private boolean validateParams(final UserAccount userAccount, final LinkedHashMap request, final LinkedHashMap response, final DaHouse daHouse) {
 		final LinkedHashMap map = new LinkedHashMap();
 		final String jugador = (String)request.get("jugador");
 		final String kudos = (String)request.get("kudos");
@@ -145,24 +164,70 @@ public class UserController {
 		try { 
 			kudosInt = Integer.parseInt(kudos); 
 			// Te prou kudos ?
-			if (StringUtils.isBlank(kudos) || userService.validateKudos(kudosInt, userAccount)) this.addError("No tienes bastantes kudos!!!!", map);
-		} catch (Exception e) { this.addError("Formato kudos!!!!", map); }
-		if (userAccount.getBill().getActiveBets() >= BetUtils.MAX_USER_BETS) this.addError("No puedes tener más de " + BetUtils.MAX_USER_BETS + " apuestas activas!!!!", map);
+			if (StringUtils.isBlank(kudos) || userService.validateKudos(kudosInt, userAccount)) this.addError("No tens prou kudos!!!!", map);
+		} catch (Exception e) { this.addError("Format kudos!!!!", map); }
+		if (userAccount.getBill().getActiveBets() >= BetUtils.MAX_USER_BETS) this.addError("No pots tenir més de " + BetUtils.MAX_USER_BETS + " apostes actives!!!!", map);
 		// tracta tipus d'aposta
 		if (BetType.AGUANTA.name().equals(tipus)) {
 			final String rondas = (String)request.get("rondas");
 			Integer rondasInt = null;
 			try { 
 				rondasInt = Integer.parseInt(rondas);
-				if (daHouse.getCurrentRound() + rondasInt > 100 /** TODO: Update when competition starts daHouse.getLastRound()*/) this.addError("No quedan suficientes rondas!!!!", map);
-			} catch (Exception e) { this.addError("Formato rondas!!!!", map); }
+				if (daHouse.getCurrentRound() + rondasInt > daHouse.getLastRound()) this.addError("No queden prou rondes!!!!", map);
+			} catch (Exception e) { this.addError("Format rondes!!!!", map); }
 		} else if (BetType.SEMIS.name().equals(tipus) || BetType.FINAL.name().equals(tipus)) {
 			// No disponible fins la final
-			if (daHouse.getCurrentRound() < daHouse.getLastRound()) this.addError("Modo de apuesta todavia no disponible!!!!", map);
-		} else this.addError("Modo de apuesta no disponible!!!!", map);
+			if (daHouse.getCurrentRound() < daHouse.getLastRound()) this.addError("Mode d'aposta encara no disponible!!!!", map);
+		} else this.addError("Mode d'aposta no disponible!!!!", map);
 		if (map.isEmpty()) return true;
 		response.putAll(map);
 		return false;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value=Routes.ENDURANCE_BET, method=RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody LinkedHashMap getEnduranceBetRate(@PathVariable final Integer kudos, @PathVariable final String jugador, @PathVariable final Integer rondes, final HttpServletRequest request) {
+		logger.info("UserController.getEnduranceBetRate");
+		final LinkedHashMap response = new LinkedHashMap();
+		final DaHouse daHouse = (DaHouse)request.getAttribute(BetUtils.DA_HOUSE);
+		final UserAccount userAccount = (UserAccount)request.getAttribute(LoggedUserUtils.LOGGED_USER); 
+		if (this.betService.validatePlayerAlive(jugador, daHouse)) {
+			final EnduranceBet bet = new EnduranceBet();
+			bet.setBetOnRound(daHouse.getCurrentRound());
+			bet.setEnduresRounds(rondes);
+			bet.setKudos(kudos);
+			bet.setPlayer(jugador);
+			bet.setType(BetType.AGUANTA.name());
+			final Double rate = this.betService.getFutureBetRate(userAccount, bet, daHouse);
+			final String formattedeRate = rate == null || rate.isNaN() ? "?" : BetUtils.formatDouble(rate);
+			response.put("rate", formattedeRate);
+		} else this.addError("Jugador mort", response);
+		return response;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value=Routes.BASE_BET, method=RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody LinkedHashMap getBaseBetRate(@PathVariable final String tipus, @PathVariable final Integer kudos, @PathVariable final String jugador, final HttpServletRequest request) {
+		logger.info("UserController.getBaseBetRate");
+		final LinkedHashMap response = new LinkedHashMap();
+		final DaHouse daHouse = (DaHouse)request.getAttribute(BetUtils.DA_HOUSE);
+		final UserAccount userAccount = (UserAccount)request.getAttribute(LoggedUserUtils.LOGGED_USER); 
+		if (this.validateTipus(tipus) && this.betService.validatePlayerAlive(jugador, daHouse)) {
+			final BaseBet bet = new BaseBet();
+			bet.setKudos(kudos);
+			bet.setPlayer(jugador);
+			bet.setType(tipus);
+			final Double rate = this.betService.getFutureBetRate(userAccount, bet, daHouse);
+			final String formattedeRate = rate == null || rate.isNaN() ? "?" : BetUtils.formatDouble(rate);
+			response.put("rate", formattedeRate);
+		} else this.addError("Tipus desconegut o jugador mort", response);
+		return response;
+	}
+	
+	private boolean validateTipus(final String tipus) {
+		if (StringUtils.isBlank(tipus)) return false;
+		if (!(BetType.AGUANTA.name().equals(tipus) || BetType.SEMIS.name().equals(tipus) || BetType.FINAL.name().equals(tipus))) return false;
+		return true;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

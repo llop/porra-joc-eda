@@ -24,6 +24,8 @@
     	/*<![CDATA[*/
     	var mainSection, mainSectionHeight, mainHeaderHeight, mainFooterHeight;
     	var availableHeightForMainSection, availableHeightForMainSectionTimeout;
+    	var mostPopTitle, mostPopTable, mvPlayersData = [];
+    	var tidx, midx, newsUpdatesScroller, newsUpdates = [];
     	function resizeHandlerInternal(ahfms) {
     		var ahfms = $(window).height() - mainHeaderHeight - mainFooterHeight - 40;
     		if (mainSectionHeight < ahfms) mainSection.height(ahfms);
@@ -32,18 +34,57 @@
    	 		resizeHandlerInternal(availableHeightForMainSection);
     		setTimeout(function() { resizeHandlerInternal(availableHeightForMainSectionTimeout); }, 150);
     	}
+   	 	function initTextScroller() {
+   	 		newsUpdatesScroller.html(newsUpdates[tidx]);
+   	 		newsUpdatesScroller.bind('marquee', function() {
+	   	        var tw = newsUpdatesScroller.width();
+	   	        var ww = newsUpdatesScroller.parent().width();
+	   	     	newsUpdatesScroller.css({ right: -tw });
+	   	  		newsUpdatesScroller.animate({ right: ww }, 20000, 'linear', function() {
+	   	        	tidx++;
+	   	        	if (tidx >= midx) tidx = 0;
+	   	        	newsUpdatesScroller.html(newsUpdates[tidx]);
+	   	        	newsUpdatesScroller.trigger('marquee');
+	   	        });
+	   	    }).trigger('marquee');
+   	 	}
+   	 	function updateNewsUpdates() {
+   	 		tidx = 0;
+   	 		midx = newsUpdates.length;
+   	 	}
+   	 	function updateMostPopularPlayers() {
+   	 		var title = mvPlayersData.length == 0 ? "Encara no hi ha apostes per cap jugador" : "Els jugadors més populars";
+	   	 	var newHtml = "";
+	   		for (i in mvPlayersData) {
+	   			var mvPlayerData = mvPlayersData[i];
+	   			newHtml += "<tr>"
+	   			newHtml += "<td class='m-p-t-r'><span>" + mvPlayerData.name + "</span></td><td><span><strong>" + mvPlayerData.popularity + "</strong>%</span></td>";
+	   			newHtml += "</tr>";
+	   		}
+	   		mostPopTitle.html(title);
+	   		mostPopTable.html(newHtml);
+   	 	}
+   	 	function updateStats() {
+   	 		updateNewsUpdates();
+   	 		updateMostPopularPlayers();
+   	 	}
    	    $(document).ready(function() {
    	 		mainSection = $('#main-section');
    	 		mainSectionHeight = mainSection.height();
     		mainHeaderHeight = $('#main-header').height();
     		mainFooterHeight = $('#main-footer').height();
+   	 		newsUpdatesScroller = $('#news-updates');
+   	 		mostPopTable = $('#most-pop-table');
+   	 		mostPopTitle = $('#most-pop-title');
+   	 		updateStats();
+   	 		initTextScroller();
    	 		$(window).resize(windowResizeHandler);
    	 		windowResizeHandler();
    	 	});
     	/*]]>*/
     	</script>
 		<div class="t-block">
-			<div id="p-title"><a th:href="${#r.r('home', 'welcome')}"><span class="w-s">La porra del Joc d'EDA</span></a></div>
+			<div id="p-title"><a th:href="${#r.r('home', 'welcome')}"><img th:src="${#r.s('p-title.png', 'img')}" alt="La porra del Joc d'EDA" /></a></div>
 			<div id="head-uni-links" >
 				<div id="upc-logo"><a href="http://www.upc.es" target="_blank"><img th:src="${#r.s('Logo_UPC.gif', 'img')}" alt="Logo UPC" /></a></div>
 				<div id="fib-logo"><a href="http://www.fib.upc.edu" target="_blank"><img th:src="${#r.s('Logo_FIB.gif', 'img')}" alt="Logo FIB" /></a></div>
@@ -78,15 +119,27 @@
     	<section id="main-section">
     	<div id="m-block">
     	<section id="m-block-left" th:fragment="blockLeft">
-    		<div class="p-5">
+    		<aside id="main-left-box">
+    		<div class="p-7">
     			<div><span class="large-text">Última ronda: <span class="o-s" th:text="${daHouse.currentRound}"></span></span></div>
     			<div class="p-t-20"><div><span class="large-text"><span class="o-s" th:text="${daHouse.playersLeft}"></span> supervivents</span></div></div>
+    			<div class="p-t-10"><div><span class="large-text"><span class="o-s" th:text="${daHouse.playersDown}"></span> han caigut</span></div></div>
     			<div id="plf-00" class="prl"></div><div id="plf-01" class="prl"></div><div id="plf-02" class="prl"></div><div id="plf-10" class="prl"></div><div id="plf-11" class="prl"></div><div id="plf-12" class="prl"></div><div id="plf-20" class="prl"></div><div id="plf-21" class="prl"></div><div id="plf-22" class="prl"></div><div id="plf-30" class="prl"></div><div id="plf-31" class="prl"></div><div id="plf-32" class="prl"></div><div id="plf-40" class="prl"></div><div id="plf-41" class="prl"></div><div id="plf-42" class="prl"></div><div id="plf-50" class="prl"></div><div id="plf-51" class="prl"></div><div id="plf-52" class="prl"></div><div id="plf-60" class="prl"></div><div id="plf-61" class="prl"></div><div id="plf-62" class="prl"></div><div id="plf-70" class="prl"></div><div id="plf-71" class="prl"></div><div id="plf-72" class="prl"></div><div id="plf-80" class="prl"></div><div id="plf-81" class="prl"></div><div id="plf-82" class="prl"></div><div id="plf-90" class="prl"></div><div id="plf-91" class="prl"></div><div id="plf-92" class="prl"></div>
-    			<div class="p-t-40">
+    			<div class="p-t-20">
     				<div><span class="large-text">Batalla final en:</span></div>
     				<script>var myCountdown1 = new Countdown({ year:2013, month:5, day:30, hour:3, ampm:"pm", minute:0, second:0, rangeHi:"day", width:260, height:50, style:"flip" });</script>
     			</div>
     		</div>
+    		</aside>
+			<div th:each="newsUpdate,rowStat : ${newsUpdates}">
+	 		<script th:inline="javascript">
+	   		/*<![CDATA[*/ 
+	           	newsUpdates.push( /*[[${ newsUpdate }]]*/ ""
+	           			);
+	   		/*]]>*/
+		   	</script>
+		   	</div>
+    		<aside id="left-box-bottom"><div id="news-updates-box"><span id="news-updates"></span></div></aside>
     	</section>
     	<div id="m-block-top">
     		<!-- logged user stuff -->
@@ -100,6 +153,26 @@
 				<div class="p-t-10"><a th:href="${#r.r('home', 'userDashboard')}"><span class="w-s">Fer una aposta</span></a></div>
 			</nav>
 			</section>
+			<section th:fragment="newsUpdatesSection" th:if="${daHouseStats.totalActiveBets != 0}">
+				<div class="a-bgb">
+				<section id="most-pop-box">
+					<div id="most-pop-title"></div>
+					<div id="m-p-t-box">
+					<table id="most-pop-table">
+					<tr th:each="mvPlayer,rowStat : ${daHouseStats.mostVotedPlayers}">
+					<script th:inline="javascript">
+			   		/*<![CDATA[*/ 
+			           	mvPlayersData.push({ name: /*[[${ mvPlayer.left }]]*/, 
+										popularity: /*[[${ mvPlayer.right }]]*/ ""
+									});
+			   		/*]]>*/
+				   	</script>
+					</tr>
+				   	</table>
+				   	</div>
+				</section>
+				</div>
+			</section>
     		<section class="a-bg">
 			<div id="takeshi-says"><img th:src="${#r.s('takesi.jpg', 'img')}" alt="Takeshi says" /></div>
 			<div id="bet-now">
@@ -109,7 +182,7 @@
 			<p class="p-t-20"><a th:href="${#r.r('home', 'userDashboard')}"><span class="w-s">Si ja tens un usuari, entra aquí</span></a></p>
 			</div>
 			</section>
-			<div class="p-t-20">
+			<div class="p-t-10">
 			<section class="a-bg">
 			<div id="bet-now">
 			<p class="p-t-20"><a th:href="${#r.r('home', 'contribute')}"><span class="w-s">Aquesta web podria servir per futures edicions del Joc!<br /><strong>Ajuda a fer-la gran!</strong></span></a></p>

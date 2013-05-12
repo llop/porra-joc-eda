@@ -14,7 +14,7 @@
    	var playerSelect, playerSelectOptions, rondasInput, kudosInput, betRate, betsMade, playersData = [];
    	function initVars() {
    		betUrl = /*[[${#r.r('user', 'makeABet')}]]*/;
-   		enduranceBetRateUrl = /*[[${#r.r('bet', 'getEnduranceBetRate')}]]*/;
+   		enduranceBetRateUrl = /*[[${#r.r('user', 'getEnduranceBetRate')}]]*/;
    		playerSelect = $("#player-select");
    		rondasInput = $("#rondas");
    		kudosInput = $("#kudos");
@@ -107,6 +107,9 @@
    		var generalData = data.generalData;
    		playersData = generalData.alivePlayerNames;
    		updateDatas();
+   		mvPlayersData = data.mostPopularPlayers;
+   		newsUpdates = data.newsUpdates;
+   		updateStats();
    		kudosInput.attr('max', generalData.kudosLeftInt);
    		rondasInput.attr('max', generalData.maxEndureRounds);
    		$("#active-bets").text(generalData.activeBets);
@@ -129,6 +132,7 @@
     <section th:substituteby="home::blockLeft"></section>
    	<div id="m-block-top">
     	<section th:substituteby="home::userSection"></section>
+    	<section th:substituteby="home::newsUpdatesSection"></section>
     	<!-- playernames for drop down -->
 	   	<script th:inline="javascript" th:each="name,rowStat : ${alivePlayerNames}">
 	   	/*<![CDATA[*/ 
