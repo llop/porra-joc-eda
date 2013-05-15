@@ -3,11 +3,15 @@ pora-joc-eda
  
 Visita la web:
  
-	http://www.porra-joc-eda.tk
+	http://porra.jutge.org
 	
 On hi trobaràs més informació:
  
-	http://www.porra-joc-eda.tk/faq
+	http://porra.jutge.org/faq
+	
+Si vols ajudar a millorar la web:
+ 
+	http://porra.jutge.org/contribueix
     
 La web del concurs:
 
