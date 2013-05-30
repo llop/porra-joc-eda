@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="desktop/fragments::head" />
+<body>
+	<header th:substituteby="desktop/fragments::header"></header>
+	<section id="main-section">
+  	<div id="m-block">
+    <section th:substituteby="desktop/fragments::blockLeft"></section>
+    <div id="m-block-top">
+    	<section th:substituteby="desktop/fragments::userSection"></section>
+    	<section th:substituteby="desktop/fragments::popularPlayersSection"></section>
+    	<section th:substituteby="desktop/fragments::richestAccounts"></section>
+    	
+    	<script th:inline="javascript">
+   	/*<![CDATA[*/
+   	//-----------------------------------------------------------------
+   	// debug
+   	//-----------------------------------------------------------------
+   	function inspectObject(obj) {
+   		var s = "";
+   		for (x in obj) s += x + ": " + obj[x] + "\n";
+   		alert(s);
+   	}
+  	//-----------------------------------------------------------------
+   	// vars
+   	//-----------------------------------------------------------------
+   	var winnerBetUrl, betUrl, roundsBetRateUrl, deleteIconUrl, jqXHR, restrictions;
+   	var accountBetsStr, alivePlayersStr, accountBetRestrictionsStr, leagueBetRestrictionsStr;
+   	var newWinnerBetFail, deleteWinnerBetFail, betRateFail, newBetFail, noBetsMadeTitle, betsMadeTitle;
+   	var playerSelect, playerSelectOptions, rondasInput, kudosInput, betRate, bMTit, betsMade;
+   	//-----------------------------------------------------------------
+   	// initialization
+   	//-----------------------------------------------------------------
+   	function initDashboardVars() {
+   		// URLs
+   		// roundsBetRateUrl = /*[[@{'/usuari/aposta/tipus/rondes/kudos/{0}/jugador/{1}/rondes/{2}'}]]*/;
+   		// betUrl = /*[[@{/usuari/fer-aposta}]]*/;
+   		winnerBetUrl = /*[[@{/usuari/aposta-guanyador}]]*/;
+   		deleteIconUrl = /*[[@{/static/img/delIcon.gif}]]*/;
+   		// localized messages
+   		newWinnerBetFail = /*[[#{exception.newWinnerBetFail}]]*/;
+   		deleteWinnerBetFail = /*[[#{exception.deleteWinnerBetFail}]]*/;
+   		// betRateFail = /*[[#{exception.betRateFail}]]*/;
+   		// newBetFail = /*[[#{exception.newBetFail}]]*/;
+   	   	noBetsMadeTitle = /*[[#{bet.noBetsMade}]]*/;
+   		betsMadeTitle = /*[[#{bet.betsMade}]]*/;
+   		// json strings
+   		accountBetsStr = /*[[${accountBets}]]*/;
+   		alivePlayersStr = /*[[${defaultLeaguePlayers}]]*/;
+   		//accountBetRestrictionsStr = /*[[${accountBetRestrictions}]]*/;
+   		//leagueBetRestrictionsStr = /*[[${defaultLeagueBetRestrictions}]]*/;
+   		// components
+   		playerSelect = $("#player-select");
+   		//rondasInput = $("#rondas");
+   		//kudosInput = $("#kudos");
+   		//betRate = $("#current-bet-rate");
+   		bMTit = $("#b-m-tit");
+   		betsMade = $("#bets-made");
+   	}
+ 	//-----------------------------------------------------------------
+   	// fieldset enabled handlers
+   	//-----------------------------------------------------------------
+   	function disableInputs() {
+   		playerSelect.attr('disabled', 'disabled');
+   		// rondasInput.attr('disabled', 'disabled');
+   		//kudosInput.attr('disabled', 'disabled');
+   	}
+   	function enableInputs() {
+   		playerSelect.removeAttr('disabled');
+   		//rondasInput.removeAttr('disabled');
+   		//kudosInput.removeAttr('disabled');
+   	}
+  	//-----------------------------------------------------------------
+   	// ajax setup
+   	//-----------------------------------------------------------------
+   	function prepareAjax() {
+		$.ajaxPrefilter("json", function(options, originalOptions, jqXHR) { if (options.type == 'POST' || options.type == 'PUT') options.data = window.JSON.stringify(originalOptions.data); });
+		$(document).ajaxSend(function(event, jqxhr, settings) { disableInputs(); });
+		$(document).ajaxComplete(function(event, jqxhr, settings) { enableInputs(); });
+	}
+	//-----------------------------------------------------------------
+   	// ajax error responses are presented with an alert
+   	//-----------------------------------------------------------------
+   	function alertErrors(errors) {
+   		var errorsData = errors;
+   		var errorText = "";
+   		for (var index in errorsData) {
+   			var errorDataBlock = errorsData[index];
+   			var message = produceUnformattedMessage(errorDataBlock.message, errorDataBlock.args);
+   			errorText += (index == 0 ? "" : "\n") + message;
+   		}
+   		alert(errorText);
+   	}
+	//-----------------------------------------------------------------
+   	// account bets
+   	//-----------------------------------------------------------------
+   	function refreshAccountBets() {
+   		var accountBets = jQuery.parseJSON(accountBetsStr);
+   		var betsExist = accountBets.length != 0;
+	 	var title = betsExist ? betsMadeTitle : noBetsMadeTitle;
+	 	var newHtml = "";
+   		for (var index in accountBets) {
+   			var accountBet = accountBets[index];
+   			var betStatus = accountBet.status;
+   			var betMessages = accountBet.messages;
+   			// Store messages in an intermediate hash cos the spec says order could be an issue
+   			var betMessagesMap = [];
+   			for (var jndex in betMessages) {
+   				var betMessage = betMessages[jndex];
+   				betMessagesMap[betMessage.name] = betMessage;
+   			}
+   			// now we have the right data blocks
+   			var forecast = betMessagesMap['betForecast'];
+   			var balance = betMessagesMap['betBalance'];
+   			// piece all the html together
+   			var forecastMsg = produceWSMessage(forecast.message, forecast.args);
+   			var balanceMsg = produceOSBMessage(balance.message, balance.args);
+   			var betDivClass = betStatus == "WIN" ? "bets-won-row" : (betStatus == "LOSS" ? "bets-lost-row" : "bets-active-row");
+   			newHtml += "<div class='" + betDivClass + "'>";
+   			if (accountBet.type == "WINNER" && betStatus == "PENDING") {
+   				newHtml += "<div style='float:right' onclick=\"deleteWinnerBet('" + accountBet.player + "')\"><img src='" + deleteIconUrl + "' alt='Delete' /></div>"
+   			}
+   			newHtml += wrapMessage(forecastMsg, "<div>", "</div>");
+   			newHtml += wrapMessage(balanceMsg, "<div class='p-t-10'>", "</div>");
+			newHtml += "</div>";
+   		}
+   		bMTit.html(title);
+   		betsMade.html(newHtml);
+   	}
+	//-----------------------------------------------------------------
+   	// alive players
+   	//-----------------------------------------------------------------
+   	function refreshAlivePlayers() {
+   		playerSelect.html("");
+   		playerSelectOptions = playerSelect.prop ? playerSelect.prop('options') : playerSelect.attr('options');
+   		var alivePlayers = jQuery.parseJSON(alivePlayersStr);
+   		for (var index in alivePlayers) {
+   			var alivePlayer = alivePlayers[index];
+   			var optionVal = alivePlayer.playerName; 
+  			var optionText = alivePlayer.readableName + ' (' + alivePlayer.playerHandle + ')';
+  			playerSelectOptions[playerSelectOptions.length] = new Option(optionText, optionVal);
+   		}
+   		playerSelect.trigger('change');
+   	}
+	//-----------------------------------------------------------------
+   	// account bet restrictions
+   	//-----------------------------------------------------------------
+   	function refreshAccountBetRestrictions() {
+   		var accountBetRestrictions = jQuery.parseJSON(accountBetRestrictionsStr);
+   		for (var index in accountBetRestrictions) {
+   			var accountBetRestriction = accountBetRestrictions[index];
+   			restrictions[accountBetRestriction.name] = accountBetRestriction;
+   		}
+   		kudosInput.attr('max', restrictions['kudosLeft'].value);
+   		kudosInput.val(restrictions['defaultKudos'].value);
+	}
+	//-----------------------------------------------------------------
+   	// league bet restrictions
+   	//-----------------------------------------------------------------
+   	function refreshLeagueBetRestrictions() {
+   		var leagueBetRestrictions = jQuery.parseJSON(leagueBetRestrictionsStr);
+   		for (var index in leagueBetRestrictions) {
+   			var leagueBetRestriction = leagueBetRestrictions[index];
+   			restrictions[leagueBetRestriction.name] = leagueBetRestriction;
+   		}
+   		rondasInput.attr('max', restrictions['maxRoundsLeft'].value);
+   		rondasInput.val(restrictions['defaultRounds'].value);
+	}
+	//-----------------------------------------------------------------
+   	// restrictions in general
+   	//-----------------------------------------------------------------
+   	function refreshRestrictions() {
+   		restrictions = [];
+   		refreshAccountBetRestrictions();
+   		refreshLeagueBetRestrictions();
+	}
+	//-----------------------------------------------------------------
+   	// dashboard update
+   	//-----------------------------------------------------------------
+   	function refreshDashboard() {
+   		// refreshRestrictions();
+		refreshAlivePlayers();
+   		refreshAccountBets();
+   	}
+  	//-----------------------------------------------------------------
+   	// update json data strings
+   	//-----------------------------------------------------------------
+   	function updateDataStrings(data) {
+   		leagueInfoStr = data.defaultLeagueInfo;
+   		leagueStatsStr = data.defaultLeagueStats;
+   		accountInfoStr = data.accountInfo;
+   		leaguePopPlayersStr = data.defaultLeaguePopularPlayers;
+   		accountBetsStr = data.accountBets;
+   		alivePlayersStr = data.defaultLeaguePlayers;
+   		//accountBetRestrictionsStr = data.accountBetRestrictions;
+   		//leagueBetRestrictionsStr = data.defaultLeagueBetRestrictions;
+  	}
+  	//-----------------------------------------------------------------
+   	// update all ui components
+   	//-----------------------------------------------------------------
+   	function refreshAll() {
+   		refreshInfo();
+   		refreshNews();
+   		if ('refreshPopPlayersTable' in this) refreshPopPlayersTable();
+   		if ('refreshRichAccTable' in this) refreshRichAccTable();
+   		refreshAccountInfo();
+   		refreshDashboard();
+   	}
+  	//-----------------------------------------------------------------
+   	// bet rate ajax handlers
+   	//-----------------------------------------------------------------
+   	function updateAndRefreshAll(data) {
+   		updateDataStrings(data);
+   		refreshAll();
+   		//getRoundsBetRate();
+   	}
+  	//-----------------------------------------------------------------
+   	// bet rate ajax handlers
+   	//-----------------------------------------------------------------
+   	function produceRoundsBetRateUrl() {
+		var i = 0, pathVars = [ kudosInput.val(), playerSelect.val(), rondasInput.val() ];
+		return roundsBetRateUrl.replace(/{.+?}/g, function() { return pathVars[i++]; });
+	}
+	function getRoundsBetRateDone(data, textStatus, jqxhr) { 
+		if (data.errors) alertErrors(data.errors);
+		else betRate.text(data.rate); 
+	}
+   	function getRoundsBetRateFail(jqxhr, textStatus, errorThrown) { alert(betRateFail); }
+   	function getRoundsBetRate() {
+   		jqXHR = $.ajax({ url: produceRoundsBetRateUrl(), dataType: 'json', type: 'GET', contentType: "application/json;charset=UTF-8" })
+           	.done(getRoundsBetRateDone).fail(getRoundsBetRateFail);
+   	}
+  	//-----------------------------------------------------------------
+   	// new winner bet ajax handlers
+   	//-----------------------------------------------------------------
+   	function requestNewWinnerBetDone(data, textStatus, jqxhr) { 
+		if (data.errors) alertErrors(data.errors);
+		else updateAndRefreshAll(data);
+	}
+   	function requestNewWinnerBetFail(jqxhr, textStatus, errorThrown) { alert(newWinnerBetFail); }
+   	function makeWinnerBet() {
+   		var params = { jugador: playerSelect.val(), tipus: 'WINNER' };
+   		jqXHR = $.ajax({ url: winnerBetUrl, data: params, dataType: 'json', type: 'POST', contentType: "application/json;charset=UTF-8" })
+           	.done(requestNewWinnerBetDone).fail(requestNewWinnerBetFail);
+   	}
+  	//-----------------------------------------------------------------
+   	// delete winner bet ajax handlers
+   	//-----------------------------------------------------------------
+   	function requestDeleteWinnerBetDone(data, textStatus, jqxhr) { 
+		if (data.errors) alertErrors(data.errors);
+		else updateAndRefreshAll(data);
+	}
+   	function requestDeleteWinnerBetFail(jqxhr, textStatus, errorThrown) { alert(deleteWinnerBetFail); }
+   	function deleteWinnerBet(playerName) {
+   		var deleteWinnerUrl = winnerBetUrl + '/' + playerName.replace(/\./g, " ");
+   		jqXHR = $.ajax({ url: deleteWinnerUrl, dataType: 'json', type: 'DELETE', contentType: "application/json;charset=UTF-8" })
+           	.done(requestDeleteWinnerBetDone).fail(requestDeleteWinnerBetFail);
+   	}
+  	//-----------------------------------------------------------------
+   	// new bet ajax handlers
+   	//-----------------------------------------------------------------
+   	function requestNewBetDone(data, textStatus, jqxhr) { 
+		if (data.errors) alertErrors(data.errors);
+		else updateAndRefreshAll(data);
+	}
+   	function requestNewBetFail(jqxhr, textStatus, errorThrown) { alert(newBetFail); }
+   	function makeABet() {
+   		var params = { jugador: playerSelect.val(), kudos: kudosInput.val(), tipus: 'ROUNDS', rondas: rondasInput.val() };
+   		jqXHR = $.ajax({ url: betUrl, data: params, dataType: 'json', type: 'POST', contentType: "application/json;charset=UTF-8" })
+           	.done(requestNewBetDone).fail(requestNewBetFail);
+   	}
+  	//-----------------------------------------------------------------
+   	// component event handlers
+   	//-----------------------------------------------------------------
+   	function digitsOnly(element) { element.val(element.val().replace(/[^0-9]/g, '')); }
+   	function setEventHandlers() {
+   		//playerSelect.change(function(event) { getRoundsBetRate(); });
+   		//rondasInput.keyup(function(event) { digitsOnly(rondasInput); });
+   		//rondasInput.change(function(event) { getRoundsBetRate(); });
+   		//kudosInput.keyup(function(event) { digitsOnly(kudosInput); });
+   		//kudosInput.change(function(event) { getRoundsBetRate(); });
+   		$("#new-bet").click(makeWinnerBet);
+   	}
+  	//-----------------------------------------------------------------
+   	// set up
+   	//-----------------------------------------------------------------
+   	$(document).ready(function() { 
+   		initDashboardVars();
+   		prepareAjax();
+   		setEventHandlers();
+   		refreshDashboard();
+   	});
+   	/*]]>*/
+   	</script>
+    	
+    	
+		<!-- Make a bet -->
+   		<section id="bet-form">
+   			<div class="p-1"><span class="t-r-t" th:text="#{view.makeWinnerBet}"></span></div>
+			<div class="p-2">
+				<div class="p-8">
+	            <div class="t-r-w-l"><label for="player-select" th:text="#{view.bet.player}"></label></div>
+				<div class="t-r-w-r">
+				<select id="player-select" name="player-select"></select>
+				</div>
+				</div>
+				<div class="t-r-b-r"><input id="new-bet" type="button" th:value="#{view.bet.imIn}" class="large-text"/></div>
+	        </div>
+		</section>
+		
+	</div>
+	
+	<!-- bets made -->
+   	<section id="bets-made-box">
+   		<div class="p-1"><span id="b-m-tit" class="large-text"></span></div>
+   		<div id="bets-made"></div>
+   	</section>
+   	
+	</div>
+	</section>
+	<footer th:substituteby="desktop/fragments::footer"></footer>
+</body>
+</html>

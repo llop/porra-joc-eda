@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:recaptcha="http://net.llop.thymeleaf.recaptcha">
+<head th:include="desktop/fragments::head" />
+<body>
+    <header th:substituteby="desktop/fragments::header"></header>
+	<section id="main-section">
+   	<div id="m-block">
+    <section th:substituteby="desktop/fragments::blockLeft"></section>
+   	<div id="m-block-top">
+   		<section th:substituteby="desktop/fragments::userSection"></section>
+   		<section th:substituteby="desktop/fragments::warnings"></section>
+   		
+		<!-- account activation form -->
+   		<section class="right-box">
+   			<script th:inline="javascript">
+		   	/*<![CDATA[*/ 
+	        	function onSubmitHandler() {
+		   			$('#signup').attr('disabled', 'disabled');
+	        		$('#loader').show();
+		   		}
+			/*]]>*/
+		   	</script>
+   			<div id="loader">
+   				<div><img th:alt="#{view.loading}" th:src="@{/static/img/loader.gif}" /></div>
+   				<div><span th:text="#{view.bePatient}"></span></div>
+   			</div>
+   			
+   			
+   			<div class="p-3"><span class="large-text" th:text="#{view.activate}"></span></div>
+   			<form id="f-form" th:action="@{'/apuntar-se/activar/' + ${activationToken}}" method="post" onsubmit="onSubmitHandler()">
+   			<div class="p-3">
+	            <div class="t-r-a-m-l"><span th:text="#{view.username}"></span></div>
+				<div class="t-r-a-m-r"><span class="w-s" th:text="${userName}"></span></div>
+	            <div class="t-r-a-n-l"><label for="pwd" th:text="#{view.password}"></label></div>
+	            <div class="t-r-a-n-r"><input type="password" id="pwd" name="pwd" autofocus="autofocus" maxlength="16" /></div>
+	            <div class="t-r-a-n-l"><label for="pwd-con" th:text="#{view.passwordConfirmation}"></label></div>
+	            <div class="t-r-a-n-r"><input type="password" id="pwd-con" name="pwd-con" maxlength="16" /></div>
+				<div class="t-r-a-b"><input id="signup" type="submit" th:value="#{view.activateButton}" class="large-text"/></div>
+			</div>
+			</form>
+			
+			
+   		</section>
+   		
+   	</div>
+   	</div>
+   	</section>
+	<footer th:substituteby="desktop/fragments::footer"></footer>
+</body>
+</html>

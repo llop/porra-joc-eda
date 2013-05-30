@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+	<head th:substituteby="desktop/fragments::head"></head>
+    <body>
+    <header th:substituteby="desktop/fragments::header"></header>
+    <section id="main-section">
+   	<div id="m-block">
+    <section th:substituteby="desktop/fragments::blockLeft"></section>
+   	<div id="m-block-top">
+    	<section th:substituteby="desktop/fragments::userSection"></section>
+    	
+		<div class="a-bg">
+		<div id="takeshi-bets"><img th:src="@{/static/img/kitano-bets.jpg}" th:alt="#{view.alt.takeshiBets}" /></div>
+		<div class="t-a-c">
+			<p><span th:utext="${#messages.msg('view.activateMsg1', userName)}"></span><br /></p>
+  			<p><span th:utext="#{view.activateMsg2}"></span><br /></p>
+  			<p><span th:utext="#{view.activateMsg4}"></span> <a th:href="@{/usuari}"><span class="w-s" th:utext="#{view.activateMsg3}"></span></a></p>
+		</div>
+		</div>
+		
+		<aside th:substituteby="desktop/fragments::backBox"></aside>
+   	</div>
+   	</div>
+   	</section>
+	<footer th:substituteby="desktop/fragments::footer"></footer>
+	</body>
+</html>

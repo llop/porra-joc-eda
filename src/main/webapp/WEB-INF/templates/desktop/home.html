@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="desktop/fragments::head" />
+<body>
+	<header th:substituteby="desktop/fragments::header"></header>
+	<section id="main-section">
+  	<div id="m-block">
+    <section th:substituteby="desktop/fragments::blockLeft"></section>
+    <div id="m-block-top">
+    	<section th:substituteby="desktop/fragments::userSection"></section>
+    	<section th:substituteby="desktop/fragments::popularPlayersSection"></section>
+    	<section th:substituteby="desktop/fragments::richestAccounts"></section>
+    	
+    	<section class="a-bg">
+			<div id="bet-now">
+			<div>
+			<p><a th:href="@{/apuntar-se}"><span class="w-s-big" style="padding-right:80px" th:text="#{view.signup}"></span></a><a th:href="@{/entrar}"><span class="w-s-big" th:text="#{view.login}"></span></a></p>
+			</div>
+			<div id="takeshi-says-win"><img th:src="@{/static/img/ultimate-takeshi.jpg}" alt="Ultimate Takeshi" /></div>
+			<p><strong><span class="w-s-big" th:utext="#{home.new.l1}"></span></strong></p>
+			<p><span class="f-s-16" th:utext="#{home.new.l2}"></span></p>
+			<p><span class="f-s-16" th:utext="#{home.new.l3}"></span></p>
+			<p><span class="f-s-16" th:utext="#{home.new.l4}"></span></p>
+			<p><span class="f-s-16" th:utext="#{home.new.l5}"></span></p>
+			<p><span class="f-s-16" th:utext="#{home.new.l6}"></span></p>
+			</div>
+		</section>
+				
+	</div>
+	</div>
+	</section>
+	<footer th:substituteby="desktop/fragments::footer"></footer>
+</body>
+</html>

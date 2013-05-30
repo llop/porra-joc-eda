@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="desktop/fragments::head" />
+<body>
+	<header th:substituteby="desktop/fragments::header"></header>
+	<section id="main-section">
+  	<div id="m-block">
+    <section th:substituteby="desktop/fragments::userSection"></section>
+  	<article id="faq-article">
+  		<header class="f-a-h">Informació general</header>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>De què va aquesta web?</span></div>
+  		<div class="ans">
+   		<p>Et permet apostar <strong>kudos</strong>, una moneda fictícia, pels teus jugadors favorits del <span class="w-s">Joc d'EDA - Battle Royale</span><strong>!!!</strong></p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>Com funciona?</span></div>
+  		<div class="ans">
+   		<p>Un cop enregistrat, pots accedir al teu panell. Allà hi gestiones les teves apostes.</p>
+   		<img th:src="@{/static/img/tut-1.png}" alt="dades usuari" />
+   		<p>Disposes de <strong>1000</strong> kudos per començar. Administra'ls bé!</p>
+   		<p>Durant les eliminatòries, pots apostar pel <strong>número de rondes que sobreviurà</strong> un determinat participant. <strong>Està permés apostar pel teu propi jugador</strong>, si hi tens prou confiança <span class="w-s">;)</span></p>
+   		<img th:src="@{/static/img/tut-2.png}" alt="formulari aposta" />
+   		<p>Pots veure totes les teves apostes, amb els kudos de benefici corresponents.</p>
+   		<img th:src="@{/static/img/tut-3.png}" alt="dades aposta" />
+   		<p>A mesura que vagin passant rondes, les teves prediccions es confirmaran o no, i guanyaràs o perderàs els kudos que t'hi hagis jugat.</p>
+   		<p>En acabar les eliminatòries, el tipus d'aposta canviarà. Podràs votar pel finalista que vulguis: si <strong>arriba a la taula final</strong>, o <strong>es declara campió absolut</strong>!</p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>Com es calculen els premis?</span></div>
+  		<div class="ans">
+   		<p>Els kudos de recompensa per encertar una aposta es calculen a partir de la probablilitat de que es compleixi la predicció, i el nombre de participants que aposten pel jugador. Les probabilitats són, per tipus d'aposta:</p>
+   		<ul>
+   			<li><span class="w-s"># rondes</span> (durant les eliminatòries):<br />
+   			<code><strong>p</strong> = 1<br />
+   			x = (total de rondes eliminatòries) - (ronda en que s'ha fet l'aposta)<br />
+			y = x - (rondes que ha d'aguantar el participant)<br />
+			mentre (x &gt; y) <strong>p</strong> *= 1 - (1 / x--)</code></li>
+			<li><span class="w-s">Taula final</span> i <span class="w-s">Guanyador</span> (acabades les eliminatòries):<br />
+			<code><strong>p</strong> = 1 / 4</code> i <code><strong>p</strong> = 1 / 16</code>, respectivament.
+			</li>
+   		</ul>
+   		<p>El nombre de participants que creuen en un jugador també influeix:</p>
+   		<code><strong>f</strong> = (participants que aposten pel jugador) / (total de participants que aposten)</code>
+   		<p>Aquest factor multiplica la diferència entre 1 i <code>p</code>, i es suma a <code>p</code>. L'invers d'aquest número, multiplicat pels kudos apostats, dona el premi per encertar.</p>
+   		<p>Com que <strong>les apostes dels demés influeixen sobre les teves</strong>, és possible que la recompensa de les teves apostes:</p>
+   		<p class="p-l-20"><strong>+ Puji</strong> si els demés usuaris voten per altres jugadors, o bé<br />
+   		<strong> + Baixi</strong> si tothom vota pel mateix jugador que tú.</p>
+   		<p>Les primeres apostes que es facin no tindràn beneficis en el premi per aquesta raó, però això canviarà de seguida que tothom comenci a votar pel seu jugador i el dels amics! <span class="w-s">:D</span></p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>Com m'enregistro?</span></div>
+  		<div class="ans">
+   		<p>Qualsevol persona amb un email es pot apuntar fent click <a th:href="@{/apuntar-se}" target="_blank"><span class="w-s">aquí</span></a>!</p>
+   		<p>Introdueix un nom d'usuari i un mail. És important que aquest últim funcioni perquè se t'enviarà un correu amb la URL d'activació. Disposaràs d'unes 6 hores per activar l'usuari -si no hi ets a temps n'huràs de crear un de nou!</p>
+   		<p>Per activar el teu usuari t'hauràs d'inventar un password -entre 4 i 16 caracters, alfanumèric. Aquest <strong>es guarda encriptat</strong>, no et preocupis, però per si de cas inventa't una clau nova que no facis servir en el teu mail, facebook, etc.</p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>He perdut el meu password, què faig?</span></div>
+  		<div class="ans">
+   		<p>No el perdis! El sistema no pot recuperar passwords!!!</p>
+   		<p>...És broma! Fes click <a th:href="@{/nova-clau}" target="_blank"><span class="w-s">aquí</span></a>. Hauràs de plenar un captcha i indicar el teu nom d'usuari. Se't tornarà a enviar un email, amb la URL per que tornis a activar el teu usuari introduïnt un nou password.</p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>La web carrega molt lent / Falta la fulla d'estils o les imatges</span></div>
+  		<div class="ans">
+   		<p>Tingues paciència, siusplau! L'aplicació està en un servidor gratuït, i carrega els recursos estàtics del Dropbox, o sigui que no respón igual de ràpid o bé que Google!</p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>No funciona / Els elements estàn desencaixats</span></div>
+  		<div class="ans">
+   		<p>Assegura't de tenir el <strong>javascript activat</strong>, i de fer servir <a href="http://www.google.com/chrome" target="_blank"><span class="w-s">Chrome</span></a> (preferiblement) o <a href="http://www.mozilla.org" target="_blank"><span class="w-s">Firefox</span></a>!</p>
+   		<p>Si ja tens això, potser és un error temporal. Espera una estona i torna a probar.</p>
+   		<p>Si el problema persisteix, envia un mail a l'<code>albert.lobo&#64;est.fib.upc.edu</code>, amb subject <strong>Web Porra Joc EDA</strong></p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>He fet una aposta de la que me'n penedeixo! La puc cancel·lar?</span></div>
+  		<div class="ans">
+   		<p>Ens sap greu però les apostes fetes no es poden cancel·lar! Aixó és només per donar més emoció: T'ho hauràs de pensar bé abans de decidir-te per un jugador!</p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>He guanyat ... kudos. Els puc cobrar?</span></div>
+  		<div class="ans">
+   		<p>No! És una moneda ficticia! Al menys et queda l'orgull d'haver fet una bona predicció :)</p>
+  		</div> 
+  		</section>
+  		
+  		<section id="q-a-section">
+  		<div class="quest"><span>Està molt bé, però aquesta web es podría millorar fent ...</span></div>
+  		<div class="ans">
+   		<p>Si tens comentaris, suggerènices, el que sigui que tingui a veure amb la web, escriu un mail a <code>albert.lobo&#64;est.fib.upc.edu</code>, que és el company que ha començat això. Posa en el subject <strong>Web Porra Joc EDA</strong></p>
+   		<p>Si a més tens temps lliure (a la UPC!?) per col·laborar-hi de forma activa, doncs ja sería perfecte! Segueix <a th:href="@{/contribueix}"><span class="w-s">aquest enllaç</span></a> per més detalls de com millorar aquesta web.</p>
+  		</div> 
+  		</section>
+  		
+  	</article>
+	</div>
+	</section>
+	<footer th:substituteby="desktop/fragments::footer"></footer>
+</body>
+</html>

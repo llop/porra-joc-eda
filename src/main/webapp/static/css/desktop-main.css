@@ -1,0 +1,123 @@
+body{background-color:#FFF;font-family:verdana,helvetica,arial;margin:0px}
+a:link{text-decoration:none}
+#main-header{background-color:#FFF;width:1000px;height:100px;margin:0px auto}
+#main-footer{background-color:#FFF}
+.t-block{width:1000px;margin:0 auto;height:70px;padding-top:10px}
+.f-block{width:1000px;margin:0 auto;height:20px;padding:20px 0px;text-align:center}
+#m-block{padding:0px 25px}
+#main-section{background-color:#AAA;width:1000px;min-height:560px;margin:0 auto;padding:20px 0px;background-image:url('../img/royalelogo.png');background-repeat:no-repeat;-moz-border-radius:15px;border-radius:5px;display:table}
+#head-links{float:right;-moz-border-radius:15px;border-radius:5px;padding:0px 4px}
+#head-uni-links{float:right;padding:4px 10px 0px 10px;background-color:#297DB5;-moz-border-radius:15px;border-radius:5px}
+#upc-logo{padding-left:14px}
+#user-links{float:right;font-size:14px}
+.w-s{color:#B00;font-weight:bold}
+.t-b-m-a{padding:5px 0px 1px 0px}
+.a-bg{background-color:rgba(255,255,255,0.8);padding:15px 20px;-moz-border-radius:15px;border-radius:5px;color:#B00;font-size:14px}
+.a-bgb{background-color:rgba(255,255,255,0.8);padding:15px 20px;-moz-border-radius:15px;border-radius:5px;color:#B00;font-size:14px;margin-bottom:10px}
+.bets-active-row{margin:10px 20px;padding:20px 30px;border:1px solid #AAA;-moz-border-radius:15px;border-radius:5px}
+.bets-won-row{margin:10px 20px;padding:20px 30px;border:1px solid #050;-moz-border-radius:15px;border-radius:5px}
+.bets-lost-row{margin:10px 20px;padding:20px 30px;border:1px solid #500;-moz-border-radius:15px;border-radius:5px}
+#p-title{height:85px;float:left;font-family:impact,verdana,helvetica,arial;font-size:64px} 
+#m-block-top{padding-left:330px}
+#m-block-left{color:#B00;font-size:14px;width:280px;height:400px;float:left}
+#main-left-box{background-color:rgba(255,255,255,0.8);padding:15px 20px;-moz-border-radius:15px;border-radius:5px;width:280px;height:290px}
+#left-box-bottom{background-color:rgba(255,255,255,0.8);padding:15px 20px;-moz-border-radius:15px;border-radius:5px;width:280px;height:30px;margin-top:10px}
+#left-box-contribute{background-color:rgba(255,255,255,0.8);padding:20px 20px 15px 20px;-moz-border-radius:15px;border-radius:5px;width:280px;height:56px;margin-top:10px}
+#user-section{background-color:rgba(255,255,255,0.8);padding:15px 20px;-moz-border-radius:15px;border-radius:5px;color:#B00;font-size:14px;margin-bottom:10px;height:50px}
+#q-a-section{padding-top:20px}
+.p-t-10{padding-top:10px}
+.p-t-20{padding-top:20px}
+.p-t-40{padding-top:40px}
+.p-l-20{padding-left:20px}
+.f-l{float:left}
+.f-r{float:right}
+.t-a-r{text-align:right}
+.f-s-20{font-size:20px}
+.f-s-16{font-size:16px}
+.f-s-14{font-size:14px}
+.f-s-24{font-size:24px}
+#takeshi-says{padding:5px 0px 10px 160px}
+takeshi-says-win{padding:20px 0px 20px 0px}
+#takeshi-bets{padding:5px 0px 10px 185px}
+#bet-now{text-align:center;padding-bottom:20px}
+.w-s-big{font-family:impact,verdana,helvetica,arial;font-size:32px;color:#B00;font-weight:bold}
+.o-s{color:#F90}
+.o-s-b{color:#F90;font-weight:bold}
+.t-r-d-l{padding:2px 10px;float:left;width:200px}
+.t-r-d-r{padding:2px 10px;float:left;width:280px}
+.t-r-w-l{padding:2px 10px;float:left;width:75px}
+.t-r-w-r{padding:2px 10px;float:left;width:405px}
+#player-select{width:250px}
+.t-r-b-l{padding:25px 10px;float:left;width:200px}
+.t-r-b-r{padding:10px 10px;float:left;width:280px}
+.large-text{font-size:32px;font-family:impact,verdana,helvetica,arial;color:#B00}
+#bet-form{background-color:rgba(255,255,255,0.8);-moz-border-radius:15px;border-radius:5px;color:#B00;font-size:14px;float:left;width:580px;margin-bottom:10px;padding:10px 20px 20px 20px}
+.p-1{padding:10px 30px}
+.p-2{padding:0px 30px}
+.p-3{padding:20px 30px}
+.p-4{padding:5px 10px}
+.p-5{padding:30px 10px}
+.p-6{padding:5px 10px 20px 10px}
+.p-7{padding:20px 10px}
+.p-8{padding:40px 0px 50px 0px}
+.t-r-t{font-size:32px;font-family:impact,verdana,helvetica,arial;color:#B00}
+#bets-made-box{background-color:rgba(255,255,255,0.8);padding:15px 20px;-moz-border-radius:15px;border-radius:5px;color:#B00;font-size:14px;float:left;width:910px}
+.right-box{background-color:rgba(255,255,255,0.8);-moz-border-radius:15px;border-radius:5px;color:#B00;font-size:14px;float:left;width:580px;margin-bottom:10px;padding:25px 20px}
+.err-msg{float:left;padding-left:10px;width:490px}
+.t-r-a-t{padding:20px 10px;float:left;width:540px}
+.t-r-a-m-l{padding:15px 10px;float:left;width:120px}
+.t-r-a-m-r{padding:15px 10px;float:left;width:150px}
+.t-r-a-n-l{padding:5px 10px;float:left;width:120px}
+.t-r-a-n-r{padding:5px 10px;float:left;width:160px}
+.t-r-a-b{padding:50px 10px;float:left;width:120px}
+.t-r-a-n-cap{padding:5px 10px;float:left;width:480px;height:100px;margin-top:10px}
+#error-box{text-align:center;padding:10px 0px}
+#back-box{background-color:rgba(255,255,255,0.8);padding:15px 20px;-moz-border-radius:15px;border-radius:5px;color:#B00;font-size:14px;margin-top:10px}
+.t-a-c{text-align:center}
+#login-err{float:left;padding:15px 0px 0px 30px;width:490px}
+#faq-article{background-color:rgba(255,255,255,0.8);padding:40px 30px;-moz-border-radius:15px;border-radius:5px;color:#B00;font-size:14px}
+.quest{font-size:20px;font-weight:bold;padding:0px 20px}
+.ans{color:#000;padding:0px 40px}
+.f-a-h{font-size:32px;font-family:impact,verdana,helvetica,arial;color:#B00;padding-bottom:10px}
+#plf-00{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper00.png") no-repeat -9999px -9999px}
+#plf-01{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper01.png") no-repeat -9999px -9999px}
+#plf-02{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper02.png") no-repeat -9999px -9999px}
+#plf-10{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper10.png") no-repeat -9999px -9999px}
+#plf-11{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper11.png") no-repeat -9999px -9999px}
+#plf-12{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper12.png") no-repeat -9999px -9999px}
+#plf-20{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper20.png") no-repeat -9999px -9999px}
+#plf-21{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper21.png") no-repeat -9999px -9999px}
+#plf-22{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper22.png") no-repeat -9999px -9999px}
+#plf-30{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper30.png") no-repeat -9999px -9999px}
+#plf-31{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper31.png") no-repeat -9999px -9999px}
+#plf-32{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper32.png") no-repeat -9999px -9999px}
+#plf-40{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper40.png") no-repeat -9999px -9999px}
+#plf-41{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper41.png") no-repeat -9999px -9999px}
+#plf-42{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper42.png") no-repeat -9999px -9999px}
+#plf-50{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper50.png") no-repeat -9999px -9999px}
+#plf-51{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper51.png") no-repeat -9999px -9999px}
+#plf-52{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper52.png") no-repeat -9999px -9999px}
+#plf-60{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper60.png") no-repeat -9999px -9999px}
+#plf-61{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper61.png") no-repeat -9999px -9999px}
+#plf-62{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper62.png") no-repeat -9999px -9999px}
+#plf-70{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper70.png") no-repeat -9999px -9999px}
+#plf-71{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper71.png") no-repeat -9999px -9999px}
+#plf-72{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper72.png") no-repeat -9999px -9999px}
+#plf-80{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper80.png") no-repeat -9999px -9999px}
+#plf-81{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper81.png") no-repeat -9999px -9999px}
+#plf-82{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper82.png") no-repeat -9999px -9999px}
+#plf-90{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper90.png") no-repeat -9999px -9999px}
+#plf-91{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper91.png") no-repeat -9999px -9999px}
+#plf-92{background:url("http://dl.dropbox.com/u/156484492/porraeda/js/countdown_v1.0.0/images/flipper92.png") no-repeat -9999px -9999px}
+.prl{}
+#loader{float:right;width:150px;text-align:center;padding-top:20px;color:#666;display:none}
+#f-form{width:430px}
+#news-updates{position:absolute;white-space:nowrap}
+#news-updates-box{position:relative;height:30px;width:270px;display:block;overflow:hidden;padding:5px}
+#most-pop-box{text-align:center;padding:15px 0px}
+#most-pop-table{margin:0px auto}
+#most-pop-title{color:#B00;font-family:impact,verdana,helvetica,arial;font-weight:bold;font-size:24px}
+#rich-acc-title{color:#B00;font-family:impact,verdana,helvetica,arial;font-weight:bold;font-size:24px}
+#rich-acc-table{margin:0px auto}
+.m-p-t-r{text-align:right;padding:2px 20px 2px 0px}
+#m-p-t-box{background-color:#FFF;margin-top:10px;padding:10px;-moz-border-radius:15px;border-radius:5px}

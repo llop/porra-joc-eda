@@ -1,0 +1,225 @@
+<!DOCTYPE HTML> 
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+
+<head th:fragment="head">
+	<meta charset="UTF-8" />
+	<title th:text="#{head.title}"></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="shortcut icon" th:href="@{/static/img/favicon.gif}" type="image/gif" />
+	<link rel="icon" th:href="@{/static/img/favicon.gif}" type="image/gif" />
+    <link rel="stylesheet" th:href="@{/static/css/mobile-main.css}" />
+	<link rel="stylesheet" th:href="@{/static/css/jquery.mobile.structure-1.3.1.min.css}" />
+	<link rel="stylesheet" th:href="@{/static/css/jquery.mobile-1.3.1.min.css}" />
+	<script th:src="@{/static/js/jquery-1.9.1.min.js}"></script>
+	<script th:src="@{/static/js/jquery.mobile-1.3.1.min.js}"></script>
+</head>
+
+
+<body>
+
+	<div data-role="header" th:fragment="header" class="ui-bar ui-bar-b">
+   		<script th:substituteby="desktop/fragments::g-analytics"></script>
+   		<script th:inline="javascript">
+   	/*<![CDATA[*/
+   	//-----------------------------------------------------------------
+   	// common-use formatting functions
+   	//-----------------------------------------------------------------
+   	function wrapMessage(message, opening, ending) {
+		return opening + message + ending;
+	}
+   	function produceFormattedMessage(message, args, opening, ending) {
+		var i = 0;
+		return message.replace(/{.+?}/g, function() { return wrapMessage(args[i++], opening, ending); });
+	}
+   	function produceOSBMessage(message, args) {
+   		return produceFormattedMessage(message, args, "<span class='o-s-b'>", "</span>");
+	}
+   	function produceOSMessage(message, args) {
+   		return produceFormattedMessage(message, args, "<span class='o-s'>", "</span>");
+	}
+   	function produceWSMessage(message, args) {
+   		return produceFormattedMessage(message, args, "<span class='w-s'>", "</span>");
+	}
+   	function produceUnformattedMessage(message, args) {
+   		return produceFormattedMessage(message, args, "", "");
+	}
+	$(document).bind("mobileinit", function(){
+		// $.mobile.ajaxEnabled = false;
+	});
+   	/*]]>*/
+   	</script>
+		<h1 th:text="#{title}"></h1>
+	</div>
+	
+	
+	<div id="league-stats" th:fragment="leagueStats" style="margin:20px">
+		<script th:inline="javascript">
+	   	/*<![CDATA[*/
+	   	//-----------------------------------------------------------------
+	   	// News (aka. stats)
+	   	//-----------------------------------------------------------------
+	   	var leagueStatsStr = /*[[${defaultLeagueStats}]]*/;
+	   	var tidx, midx, newsUpdatesScroller, newsUpdates;
+	   	function produceNewsMessage(message, args) {
+			var i = 0;
+			return message.replace(/{.+?}/g, function() { return "<span class='o-s-b'>" + args[i++] + "</span>"; });
+		}
+	   	function refreshNews() {
+	   		newsUpdates = [];
+	   		var leagueStats = jQuery.parseJSON(leagueStatsStr);
+	   		for (var index in leagueStats) {
+	   			var leagueInfoBlock = leagueStats[index];
+	   			var message = produceNewsMessage(leagueInfoBlock.message, leagueInfoBlock.args);
+	   			newsUpdates.push(message);
+	   		}
+	   		tidx = 0; midx = newsUpdates.length;
+	   	}
+	   	function initTextScroller() {
+	   		newsUpdatesScroller = $('#news-updates');
+  	 		newsUpdatesScroller.html(newsUpdates[tidx]);
+  	 		newsUpdatesScroller.bind('marquee', function() {
+	   	        var tw = newsUpdatesScroller.width();
+	   	        var ww = newsUpdatesScroller.parent().width();
+	   	     	newsUpdatesScroller.css({ right: -tw });
+	   	  		newsUpdatesScroller.animate({ right: ww }, 15000, 'linear', function() {
+	   	        	tidx++;
+	   	        	if (tidx >= midx) tidx = 0;
+	   	        	newsUpdatesScroller.html(newsUpdates[tidx]);
+	   	        	newsUpdatesScroller.trigger('marquee');
+	   	        });
+	   	    }).trigger('marquee');
+  	 	}
+	   	//-----------------------------------------------------------------
+	   	// set up
+	   	//-----------------------------------------------------------------
+	   	$(document).on("pagechange", function() {
+	   		refreshNews();
+  	 		initTextScroller();
+	   	});
+	   	/*]]>*/
+	   	</script>
+   		<div id="news-updates-box"><span id="news-updates"></span></div>
+   	</div>
+	   	
+	<div th:fragment="leagueInfo" style="margin:20px">
+		<script th:inline="javascript">
+	   	/*<![CDATA[*/
+	   	//-----------------------------------------------------------------
+	   	// Info
+	   	//-----------------------------------------------------------------
+	   	var leagueInfoStr = /*[[${defaultLeagueInfo}]]*/;
+	   	function produceInfoMessage(message, args) {
+			var i = 0;
+			return message.replace(/{.+?}/g, function() { return "<span class='o-s'>" + args[i++] + "</span>"; });
+		}
+	   	function refreshInfo() {
+	   		var leagueInfo = jQuery.parseJSON(leagueInfoStr);
+	   		for (var index in leagueInfo) {
+	   			var leagueInfoBlock = leagueInfo[index];
+	   			var message = produceInfoMessage(leagueInfoBlock.message, leagueInfoBlock.args);
+	   			$("#" + leagueInfoBlock.name).html(message);
+	   		}
+	   	}
+	   	//-----------------------------------------------------------------
+	   	// set up
+	   	//-----------------------------------------------------------------
+	   	$(document).on("pageinit", function() {
+	   		refreshInfo();
+	   	});
+	   	/*]]>*/
+	   	</script>
+	   	<div><span id="round" class="w-s"></span></div>
+		<div><span id="survivors" class="w-s"></span></div>
+		<div><span id="killed" class="w-s"></span></div>
+	</div>
+	
+	
+	<div th:fragment="popularPlayers" style="margin:20px">
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+	   	//-----------------------------------------------------------------
+	   	// most voted players
+	   	//-----------------------------------------------------------------
+	   	var leaguePopPlayersStr, popPlayersTitle, noPopPlayersTitle;
+	   	var mostPopTitle, mostPopTable;
+	   	function initMostPopularPlayers() {
+	   		leaguePopPlayersStr = /*[[${defaultLeaguePopularPlayers}]]*/;
+		   	popPlayersTitle = /*[[#{view.popPlayersTitle}]]*/;
+		   	noPopPlayersTitle = /*[[#{view.noPopPlayersTitle}]]*/;
+			mostPopTable = $('#most-pop-table');
+			mostPopTitle = $('#most-pop-title');
+	   	}
+	   	function mvPlayerDataHtmlRow(mvPlayerData) {
+	   		return "<tr><td class='m-p-t-r'><span>" + mvPlayerData.name + "<strong> (<span class='o-s'>" + mvPlayerData.handle + "</span>)</strong></span></td>" + 
+	   			"<td><span><strong>" + mvPlayerData.popularity + "<span class='o-s'>%</span></strong></span></td></tr>";
+	   	}
+	   	function refreshPopPlayersTable() {
+	   		var mvPlayersData = jQuery.parseJSON(leaguePopPlayersStr);
+	   		var popPlayersExist = !mvPlayersData || mvPlayersData.length != 0;
+  	 		var title = popPlayersExist ? popPlayersTitle : noPopPlayersTitle;
+	   	 	var newHtml = "";
+	   		for (var index in mvPlayersData) {
+	   			var mvPlayerData = mvPlayersData[index];
+	   			newHtml += mvPlayerDataHtmlRow(mvPlayerData);
+	   		}
+	   		mostPopTitle.html(title);
+	   		mostPopTable.html(newHtml);
+  	 	}
+	   	//-----------------------------------------------------------------
+	   	// set up
+	   	//-----------------------------------------------------------------
+	   	$(document).on("pageinit", function() {
+	   		initMostPopularPlayers();
+	   		refreshPopPlayersTable();
+	   	});
+	   	/*]]>*/
+	   	</script>
+	   	<div id="most-pop-box">
+			<div id="most-pop-title"></div>
+			<div id="m-p-t-box">
+			<table id="most-pop-table" style="margin:0px auto"></table>
+	   		</div>
+		</div>
+	</div>
+	
+	<!-- warning box -->
+	<div th:fragment="warnings" th:if="${errors}" class="ui-corner-all ui-br" style="margin-top:20px">
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+	   	//-----------------------------------------------------------------
+	   	// warnings
+	   	//-----------------------------------------------------------------
+	   	var warningStr, warningsList;
+		function initWarningsVars() {
+			warningStr = /*[[${errors}]]*/;
+			warningsList = $('#warnings-list');
+		}
+	   	function refreshWarnings() {
+	   		var warningData = jQuery.parseJSON(warningStr);
+	   		var newHtml = "";
+	   		for (var index in warningData) {
+	   			var warningDataBlock = warningData[index];
+	   			var message = produceWSMessage(warningDataBlock.message, warningDataBlock.args);
+	   			newHtml += wrapMessage(message, "<li>", "</li>");
+	   		}
+	   		warningsList.html(newHtml);
+	   	}
+	   	//-----------------------------------------------------------------
+	   	// set up
+	   	//-----------------------------------------------------------------
+	   	$(document).on("pageinit", function() {
+	   		initWarningsVars();
+	   		refreshWarnings();
+	   	});
+	   	/*]]>*/
+	   	</script>
+		<div id="warnings-list" style="padding:10px 0px"></div>
+	</div>
+	
+	<div data-role="footer" th:fragment="footer" class="ui-bar ui-bar-b" style="text-align:center">
+		<a href="https://battle-royale.jutge.org">battle-royale.jutge.org</a>
+	</div>
+	
+</body>
+</html>

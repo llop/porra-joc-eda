@@ -1,0 +1,56 @@
+<!DOCTYPE HTML> 
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="mobile/fragments::head" />
+<body>
+	
+<div id="mobile-login" data-role="page" class="type-interior">
+
+	<div th:substituteby="mobile/fragments::header"></div>
+
+	<div data-role="content" class="ui-body ui-body-b">
+	<div style="background-image:url('/porra-joc-jutge/static/img/royalelogo.png');background-repeat:no-repeat;background-position:center">
+	<div style="background-color:rgba(255,255,255,0.8);border-radius:5px;text-align:center;color:#B00;text-shadow:0 -1px 0 #888">
+	<div style="padding:10px">
+	
+		<div class="ui-corner-all ui-br">
+		<h3 th:text="#{view.join}"></h3>
+		</div>
+		
+		<div th:substituteby="mobile/fragments::warnings"></div>
+		
+		<script th:inline="javascript">
+	   	/*<![CDATA[*/ 
+        	function onSubmitHandler() {
+	   			$('#login').attr('disabled', 'disabled');
+	   		}
+		/*]]>*/
+	   	</script>
+		<form data-ajax="false" th:action="@{/mobil/autenticacio}" method="post" onsubmit="onSubmitHandler()" class="ui-corner-all ui-br" style="margin:20px 0px 10px 0px">
+		<fieldset style="padding:0px 20px">
+		
+		<div data-role="fieldcontain">
+		    <label for="j_username" th:text="#{view.username}"></label>
+		    <input type="text" id="j_username" name="j_username" autofocus="autofocus" maxlength="16" th:value="${usr}" />
+		</div>
+		
+		<div data-role="fieldcontain">
+		    <label for="j_password" th:text="#{view.password}"></label>
+		    <input type="password" id="j_password" name="j_password" />
+		</div>
+		
+		<button id="login" type="submit" data-theme="b" name="submit" value="submit" th:text="#{view.loginButton}"></button>
+		
+		</fieldset>
+		</form>
+		
+	</div>
+	</div>
+	</div>
+	</div>
+	
+	<div th:substituteby="mobile/fragments::footer"></div>
+	
+</div>
+	
+</body>
+</html>

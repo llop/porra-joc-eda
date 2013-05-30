@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:recaptcha="http://net.llop.thymeleaf.recaptcha">
+<head th:include="desktop/fragments::head" />
+<body>
+    <header th:substituteby="desktop/fragments::header"></header>
+	<section id="main-section">
+   	<div id="m-block">
+    <section th:substituteby="desktop/fragments::blockLeft"></section>
+   	<div id="m-block-top">
+   		<section th:substituteby="desktop/fragments::userSection"></section>
+   		<section th:substituteby="desktop/fragments::warnings"></section>
+   		
+		<!-- reset password form -->
+   		<section class="right-box">
+   			<script th:inline="javascript">
+		   	/*<![CDATA[*/ 
+	        	function onSubmitHandler() {
+		   			$('#reset').attr('disabled', 'disabled');
+	        		$('#loader').show();
+		   		}
+			/*]]>*/
+		   	</script>
+   			<div id="loader">
+   				<div><img th:alt="#{view.loading}" th:src="@{/static/img/loader.gif}" /></div>
+   				<div><span th:text="#{view.bePatient}"></span></div>
+   			</div>
+   			<div class="p-3"><span class="large-text" th:text="#{view.resetPassword}"></span></div>
+   			<form id="f-form" th:action="@{/nova-clau}" method="post" onsubmit="onSubmitHandler()">
+   			<div class="p-3">
+	            <div class="t-r-a-n-l"><label for="usr" th:text="#{view.username}"></label></div>
+	            <div class="t-r-a-n-r"><input type="text" id="usr" name="usr" autofocus="autofocus" maxlength="16" th:value="${usr}" /></div>
+	            <div class="t-r-a-n-l"><label for="mil" th:text="#{view.email}"></label></div>
+	            <div class="t-r-a-n-r"><input type="email" id="mil" name="mil" th:value="${mil}" /></div>
+				<div class="t-r-a-n-cap"><div recaptcha:recaptcha=""></div></div>
+				<div class="t-r-a-b"><input id="reset" type="submit" th:value="#{view.resetBtn}" class="large-text"/></div>
+			</div>
+			</form>
+   		</section>
+   		
+   	</div>
+   	</div>
+   	</section>
+	<footer th:substituteby="desktop/fragments::footer"></footer>
+</body>
+</html>

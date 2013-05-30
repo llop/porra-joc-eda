@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="desktop/fragments::head" />
+<body>
+	<header th:substituteby="desktop/fragments::header"></header>
+	<section id="main-section">
+  	<div id="m-block">
+    <section th:substituteby="desktop/fragments::blockLeft"></section>
+    <div id="m-block-top">
+    	<section th:substituteby="desktop/fragments::userSection"></section>
+    	
+    	<script th:inline="javascript">
+	   	/*<![CDATA[*/
+	   	//-----------------------------------------------------------------
+	   	// errors
+	   	//-----------------------------------------------------------------
+	   	var errorBox;
+		var errorsStr = /*[[${errors}]]*/;
+		function refreshErrors() {
+	   		var errorsData = jQuery.parseJSON(errorsStr);
+	   		var newHtml = "";
+	   		for (var index in errorsData) {
+	   			var errorDataBlock = errorsData[index];
+	   			var message = produceUnformattedMessage(errorDataBlock.message, errorDataBlock.args);
+	   			newHtml += wrapMessage(message, "<p><strong><span class='f-s-24'>", "</span></strong></p>");
+	   		}
+	   		errorBox.html(newHtml);
+	   	}
+	   	//-----------------------------------------------------------------
+	   	// set up
+	   	//-----------------------------------------------------------------
+	   	$(document).ready(function() {
+	   		errorBox = $('#error-box');
+	   		refreshErrors();
+	   	});
+	   	/*]]>*/
+	   	</script>
+		<div class="a-bg">
+		<div id="takeshi-says"><img th:src="@{/static/img/kitano-suicide.jpg}" th:alt="#{view.alt.takeshiSuicide}" /></div>
+		<div id="error-box"></div>
+		</div>
+		<aside th:substituteby="desktop/fragments::backBox"></aside>
+		
+	</div>
+	</div>
+	</section>
+	<footer th:substituteby="desktop/fragments::footer"></footer>
+</body>
+</html>

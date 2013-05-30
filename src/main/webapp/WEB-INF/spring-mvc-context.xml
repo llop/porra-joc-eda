@@ -5,37 +5,20 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
-	<context:component-scan base-package="net.llop.porraeda" />
-	
-	<bean id="assetsHost" class="net.llop.thymeleaf.springrouting3.dropbox.DropboxAssetsHost">
-		<property name="rootUrl" value="http://dl.dropbox.com/u/156484492/porraeda" />
-		<property name="folders">
-			<map>
-				<entry key="img" value="img" />
-				<entry key="css" value="css" />
-				<entry key="js" value="js" />
-			</map>
-		</property>
-	</bean>
-	<bean id="springRouter" class="net.llop.spring3.routing.SpringRouter" />
-	
 	<bean id="templateResolver" class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
 		<property name="prefix" value="/WEB-INF/templates/" />
 		<property name="suffix" value=".html" />
 		<property name="templateMode" value="HTML5" />
-        <property name="order" value="1" />
+		<property name="order" value="1" />
 		<property name="cacheable" value="false" />
 	</bean>
 
 	<bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
 		<property name="templateResolver" ref="templateResolver" />
-		<property name="dialect">
-			<bean class="net.llop.thymeleaf.springrouting3.dialect.SpringRoutingDialect" />
-		</property>
 		<property name="additionalDialects">
 			<set>
 				<bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect" />
-				<bean class="net.llop.thymeleaf.recaptcha.dialect.ReCaptchaDialect" />
+				<bean class="org.jutge.joc.porra.recaptcha.thymeleaf.dialect.ReCaptchaDialect" />
 			</set>
 		</property>
 	</bean>
@@ -44,7 +27,5 @@
 		<property name="templateEngine" ref="templateEngine" />
 		<property name="characterEncoding" value="UTF-8" />
 	</bean>
-
-	<mvc:default-servlet-handler />
 
 </beans>

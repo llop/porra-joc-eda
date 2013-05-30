@@ -1,5 +1,5 @@
-pora-joc-eda
-------------
+pora-joc-jutge
+--------------
  
 Visita la web:
  
@@ -8,10 +8,6 @@ Visita la web:
 On hi trobaràs més informació:
  
 	http://porra.jutge.org/faq
-	
-Si vols ajudar a millorar la web:
- 
-	http://porra.jutge.org/contribueix
     
 La web del concurs:
 

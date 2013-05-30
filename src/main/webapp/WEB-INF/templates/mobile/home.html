@@ -1,0 +1,42 @@
+<!DOCTYPE HTML> 
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="mobile/fragments::head" />
+<body>
+	
+<div id="mobile-home" data-role="page" class="type-interior">
+
+	<div th:substituteby="mobile/fragments::header"></div>
+
+	<div data-role="content" class="ui-body ui-body-b">
+	<div style="background-image:url('/porra-joc-jutge/static/img/royalelogo.png');background-repeat:no-repeat;background-position:center top">
+	<div style="background-color:rgba(255,255,255,0.8);border-radius:5px;text-align:center;color:#B00;text-shadow:0 -1px 0 #888">
+	<div style="padding:10px 10px 0px 10px">
+	
+		
+		<div class="ui-corner-all ui-br">
+		<div th:substituteby="mobile/fragments::leagueInfo"></div>
+		</div>
+		
+		<div class="ui-corner-all ui-br" style="margin:20px 0px 10px 0px">
+		<div th:substituteby="mobile/fragments::popularPlayers"></div>
+		</div>
+		
+		<div class="ui-corner-all ui-br" style="margin-top:20px">
+		<div th:substituteby="mobile/fragments::leagueStats"></div>
+		</div>
+		
+		<div class="ui-corner-all"  style="padding:10px 0px">
+		<a th:href="@{/mobil/entrar/}" data-role="button" th:text="#{view.login}"></a>
+		</div>
+		
+	</div>
+	</div>
+	</div>
+	</div>
+	
+	<div th:substituteby="mobile/fragments::footer"></div>
+	
+</div>
+	
+</body>
+</html>

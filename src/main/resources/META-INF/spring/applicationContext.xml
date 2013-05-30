@@ -1,37 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:security="http://www.springframework.org/schema/security"
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
 		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
-		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
-
-	<context:component-scan base-package="net.llop.porraeda" />
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+	
+	<!-- EntityStash AOP -->
+	<aop:aspectj-autoproxy />
+	<bean id="entityStashAspect" class="org.jutge.joc.porra.entitystash.aspect.EntityStashAspect" />
+	
+	<!-- Spring automagically wires annotated stuff from this package into the ApplicationContext -->
+	<context:component-scan base-package="org.jutge.joc.porra" />
+	
+	<!-- Needed to dispatch requests to controller-annotated classes (see http://blog.springsource.com/2009/12/21/mvc-simplifications-in-spring-3-0/) -->
 	<mvc:annotation-driven />
+	
+	<!-- Interceptors -->
 	<mvc:interceptors>
-		<bean class="net.llop.porraeda.security.LoggedUserInterceptor" />
-		<bean class="net.llop.porraeda.interceptor.DaHouseInterceptor" />
-		<mvc:interceptor>
-			<mvc:mapping path="/nova-clau" />
-			<mvc:mapping path="/apuntar-se" />
-			<bean class="net.llop.recaptcha.spring.interceptor.ReCaptchaInterceptor" />
-		</mvc:interceptor>
+		<!-- Finds out about the device issuing the request by inspecting headers -->
+	  	<bean class="org.springframework.mobile.device.DeviceResolverHandlerInterceptor" />
+	  	<bean class="org.jutge.joc.porra.recaptcha.interceptor.ReCaptchaInterceptor" />
 	</mvc:interceptors>
-
+    
 	<!-- Configure Authentication mechanism -->
 	<security:authentication-manager alias="authenticationManager">
 		<security:authentication-provider ref="mongoDBAuthenticationProvider" />
 	</security:authentication-manager>
 
-	<security:http auto-config="true" use-expressions="true">
-		<!-- Login pages -->
-		<security:form-login login-page="/entrar/" authentication-failure-url="/entrar/error" />
-		<security:logout invalidate-session="true" />
-		<!-- Security zones -->
+	<security:http auto-config="true" use-expressions="true" pattern="/mobil/**">
+		<security:form-login login-processing-url="/mobil/autenticacio" login-page="/mobil/entrar" authentication-failure-url="/mobil/entrar" default-target-url="/mobil/usuari" />
+		<security:logout logout-url="/mobil/sortir" logout-success-url="/mobil" invalidate-session="true" delete-cookies="JSESSIONID" />
+		<security:intercept-url pattern="/mobil/usuari/**" access="hasRole('ROLE_USER')" />
+	</security:http>
+	<security:http auto-config="true" use-expressions="true" pattern="/**">
+		<security:form-login login-processing-url="/autenticacio" login-page="/entrar" authentication-failure-url="/entrar" default-target-url="/usuari" />
+		<security:logout logout-url="/sortir" logout-success-url="/" invalidate-session="true" delete-cookies="JSESSIONID" />
 		<security:intercept-url pattern="/usuari/**" access="hasRole('ROLE_USER')" />
 	</security:http>
-
+	
+	<!-- Localization -->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+    	<property name="basename" value="classpath:/locale/messages" />
+    	<property name="defaultEncoding" value="UTF-8" />
+    	<property name="fallbackToSystemLocale" value="false" />
+    </bean>
+	
+	
 </beans>

@@ -2,3 +2,13 @@ versio 0.3.2
 ============
 
 - Primera versió pública
+
+
+versio 0.8
+==========
+
+- Internacionalització
+- Model de dades redissenyat
+- EntityStash AOP proxy per consultes i respostes json
+- Apostes per la final
+- Bugfixing

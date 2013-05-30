@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:recaptcha="http://net.llop.thymeleaf.recaptcha">
+<head th:include="desktop/fragments::head" />
+<body>
+    <header th:substituteby="desktop/fragments::header"></header>
+	<section id="main-section">
+   	<div id="m-block">
+    <section th:substituteby="desktop/fragments::blockLeft"></section>
+   	<div id="m-block-top">
+   		<section th:substituteby="desktop/fragments::userSection"></section>
+   		<section th:substituteby="desktop/fragments::warnings"></section>
+   		
+		<!-- signup form -->
+   		<section class="right-box">
+   			<script th:inline="javascript">
+		   	/*<![CDATA[*/ 
+	        	function onSubmitHandler() {
+		   			$('#login-button').attr('disabled', 'disabled');
+	        		$('#loader').show();
+		   		}
+			/*]]>*/
+		   	</script>
+   			<div id="loader">
+   				<div><img th:alt="#{view.loading}" th:src="@{/static/img/loader.gif}" /></div>
+   				<div><span th:text="#{view.bePatient}"></span></div>
+   			</div>
+   			<div class="p-3"><span class="large-text" th:text="#{view.accessDashboard}"></span></div>
+   			<form id="f-form" th:action="@{/autenticacio}" method="post" onsubmit="onSubmitHandler()">
+   			<div class="p-3">
+	            <div class="t-r-a-n-l"><label for="j_username" th:text="#{view.username}"></label></div>
+				<div class="t-r-a-n-r"><input type="text" id="j_username" name="j_username" autofocus="autofocus" th:value="${usr}" /></div>
+	            <div class="t-r-a-n-l"><label for="j_password" th:text="#{view.password}"></label></div>
+	            <div class="t-r-a-n-r"><input type="password" id="j_password" name="j_password" /></div>
+				<div class="t-r-a-b"><input id="login-button" type="submit" th:value="#{view.loginButton}" class="large-text"/></div>
+			</div>
+			</form>
+   		</section>
+   		
+   	</div>
+   	</div>
+   	</section>
+	<footer th:substituteby="desktop/fragments::footer"></footer>
+</body>
+</html>
